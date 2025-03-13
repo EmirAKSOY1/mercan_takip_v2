@@ -100,148 +100,160 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Theme.of(context).colorScheme.primary,
-                    Theme.of(context).colorScheme.primary.withOpacity(0.8),
-                  ],
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const CircleAvatar(
-                    radius: 30,
-                    backgroundColor: Colors.white,
-                    child: Icon(
-                      Icons.person,
-                      size: 35,
-                      color: Colors.blue,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Agrokush',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
+        child: Container(
+          color: Colors.white,
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
                       children: [
-                        Icon(
-                          Icons.verified,
-                          size: 14,
-                          color: Colors.white,
-                        ),
-                        SizedBox(width: 4),
                         Text(
-                          'Premium Üye',
+                          'MERCAN',
                           style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.white,
+                            color: Colors.indigo[900],
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'TAKIP',
+                          style: TextStyle(
+                            color: Colors.orange[700],
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1,
                           ),
                         ),
                       ],
                     ),
+                  ],
+                ),
+              ),
+              _buildDrawerItem(
+                icon: Icons.dashboard_rounded,
+                title: 'Dashboard',
+                isSelected: true,
+                onTap: () => Navigator.pop(context),
+              ),
+              _buildDrawerItem(
+                icon: Icons.analytics_rounded,
+                title: 'İstatistikler',
+                isSelected: false,
+                onTap: () {
+                  Navigator.pop(context);
+                  // TODO: Navigate to analytics page
+                },
+              ),
+              _buildDrawerItem(
+                icon: Icons.calendar_today_rounded,
+                title: 'Kümes Takvimi',
+                isSelected: false,
+                onTap: () {
+                  Navigator.pop(context);
+                  // TODO: Navigate to schedule page
+                },
+              ),
+              _buildDrawerItem(
+                icon: Icons.notifications_rounded,
+                title: 'Bildirimler',
+                isSelected: false,
+                onTap: () {
+                  Navigator.pop(context);
+                  // TODO: Navigate to notifications page
+                },
+              ),
+              _buildDrawerItem(
+                icon: Icons.device_hub_rounded,
+                title: 'Sensörler',
+                isSelected: false,
+                onTap: () {
+                  Navigator.pop(context);
+                  // TODO: Navigate to sensors page
+                },
+              ),
+              const SizedBox(height: 16),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24),
+                child: Text(
+                  'Diğer',
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
                   ),
-                ],
+                ),
               ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.home),
-              title: const Text('Ana Sayfa'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.person),
-              title: const Text('Profil'),
-              onTap: () {
-                Navigator.pop(context);
-                // TODO: Navigate to profile page
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.settings),
-              title: const Text('Ayarlar'),
-              onTap: () {
-                Navigator.pop(context);
-                // TODO: Navigate to settings page
-              },
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.help),
-              title: const Text('Yardım'),
-              onTap: () {
-                Navigator.pop(context);
-                // TODO: Navigate to help page
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.info),
-              title: const Text('Hakkında'),
-              onTap: () {
-                Navigator.pop(context);
-                // TODO: Navigate to about page
-              },
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.logout, color: Colors.red),
-              title: const Text(
-                'Çıkış Yap',
-                style: TextStyle(color: Colors.red),
+              const SizedBox(height: 8),
+              _buildDrawerItem(
+                icon: Icons.archive_rounded,
+                title: 'Arşiv',
+                isSelected: false,
+                onTap: () {
+                  Navigator.pop(context);
+                  // TODO: Navigate to archives page
+                },
               ),
-              onTap: () {
-                Navigator.pop(context);
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text('Çıkış Yap'),
-                    content: const Text('Çıkış yapmak istediğinize emin misiniz?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('İptal'),
+              _buildDrawerItem(
+                icon: Icons.settings_rounded,
+                title: 'Ayarlar',
+                isSelected: false,
+                onTap: () {
+                  Navigator.pop(context);
+                  // TODO: Navigate to settings page
+                },
+              ),
+              _buildDrawerItem(
+                icon: Icons.help_outline_rounded,
+                title: 'Yardım',
+                isSelected: false,
+                onTap: () {
+                  Navigator.pop(context);
+                  // TODO: Navigate to help page
+                },
+              ),
+              _buildDrawerItem(
+                icon: Icons.logout_rounded,
+                title: 'Çıkış Yap',
+                isSelected: false,
+                onTap: () {
+                  Navigator.pop(context);
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          _handleLogout();
-                        },
-                        child: const Text(
-                          'Çıkış Yap',
-                          style: TextStyle(color: Colors.red),
+                      title: const Text('Çıkış Yap'),
+                      content: const Text('Çıkış yapmak istediğinize emin misiniz?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('İptal'),
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ],
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            _handleLogout();
+                          },
+                          child: const Text(
+                            'Çıkış Yap',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
       appBar: AppBar(
@@ -619,6 +631,33 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildDrawerItem({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+    required bool isSelected,
+  }) {
+    return ListTile(
+      leading: Icon(
+        icon,
+        color: isSelected ? Colors.indigo[900] : Colors.grey[600],
+        size: 22,
+      ),
+      title: Text(
+        title,
+        style: TextStyle(
+          color: isSelected ? Colors.indigo[900] : Colors.grey[800],
+          fontSize: 15,
+          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+        ),
+      ),
+      onTap: onTap,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+      visualDensity: const VisualDensity(horizontal: -4, vertical: -2),
+      dense: true,
     );
   }
 }
