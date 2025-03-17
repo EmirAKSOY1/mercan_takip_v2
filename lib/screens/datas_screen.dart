@@ -13,6 +13,17 @@ class _DatasScreenState extends State<DatasScreen> {
   final int _itemsPerPage = 5;
   int _currentPage = 0;
   final int _totalItems = 10; // Örnek veri sayısı
+  String? _selectedCoop;
+
+  // Kümes listesi
+  final List<String> _coops = [
+    'Tümü',
+    'Kümes-1',
+    'Kümes-2',
+    'Kümes-3',
+    'Kümes-4',
+    'Kümes-5',
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -72,25 +83,55 @@ class _DatasScreenState extends State<DatasScreen> {
           const SizedBox(height: 24),
 
           // Filtreler
-          Row(
-            children: [
-              Expanded(
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.filter_list),
-                        const SizedBox(width: 8),
-                        const Text('Filtrele'),
-                        const Spacer(),
-                        Icon(Icons.arrow_drop_down),
-                      ],
-                    ),
+          Card(
+            child: ExpansionTile(
+              leading: const Icon(Icons.filter_list),
+              title: const Text('Filtrele'),
+              trailing: const Icon(Icons.arrow_drop_down),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Kümes Seçin',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.grey[300]!),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            value: _selectedCoop ?? 'Tümü',
+                            isExpanded: true,
+                            items: _coops.map((String coop) {
+                              return DropdownMenuItem<String>(
+                                value: coop,
+                                child: Text(coop),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                _selectedCoop = newValue;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           const SizedBox(height: 16),
 

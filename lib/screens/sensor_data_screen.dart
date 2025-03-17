@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:mercan_takip_v2/widgets/app_drawer.dart';
+import 'package:mercan_takip_v2/widgets/bottom_nav_bar.dart';
 
 class DashedLinePainter extends CustomPainter {
   final Size screenSize;
@@ -280,33 +281,7 @@ class SensorDataScreen2 extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.green,
-        unselectedItemColor: Colors.grey,
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Anasayfa',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart),
-            label: 'Grafikler',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add_circle_outline),
-            label: 'Veriler',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: 'Alarmlar',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Paylaş',
-          ),
-        ],
-      ),
+      bottomNavigationBar: const BottomNavBar(currentIndex: -1),
     );
   }
 

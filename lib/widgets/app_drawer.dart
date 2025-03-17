@@ -53,9 +53,9 @@ class AppDrawer extends StatelessWidget {
               isSelected: currentRoute == '/home',
               onTap: () {
                 if (currentRoute != '/home') {
-                  Navigator.pushReplacementNamed(context, '/home');
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/home');
                 }
-                Navigator.pop(context);
               },
             ),
             _buildDrawerItem(
@@ -69,40 +69,19 @@ class AppDrawer extends StatelessWidget {
                 Navigator.pop(context);
               },
             ),
-            _buildDrawerItem(
-              icon: Icons.calendar_today_rounded,
-              title: 'Kümes Takvimi',
-              isSelected: currentRoute == '/schedule',
-              onTap: () {
-                if (currentRoute != '/schedule') {
-                  Navigator.pushReplacementNamed(context, '/schedule');
-                }
-                Navigator.pop(context);
-              },
-            ),
+
             _buildDrawerItem(
               icon: Icons.notifications_rounded,
               title: 'Alarmlar',
-              isSelected: currentRoute == '/notifications',
+              isSelected: currentRoute == '/alarms',
               onTap: () {
-                if (currentRoute != '/notifications') {
-                  Navigator.pushReplacementNamed(context, '/notifications');
-                }
+
                 Navigator.pop(context);
+                Navigator.pushNamed(context, '/alarms');
               },
             ),
-            _buildDrawerItem(
-              icon: Icons.device_hub_rounded,
-              title: 'Sensörler',
-              isSelected: currentRoute == '/sensors',
-              onTap: () {
-                if (currentRoute != '/sensors') {
-                  Navigator.pushReplacementNamed(context, '/sensors');
-                }
-                Navigator.pop(context);
-              },
-            ),
-            const SizedBox(height: 16),
+
+            const SizedBox(height: 26),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 24),
               child: Text(

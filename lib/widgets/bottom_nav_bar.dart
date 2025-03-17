@@ -11,7 +11,9 @@ class BottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
-      currentIndex: currentIndex,
+      currentIndex: currentIndex >= 0 ? currentIndex : 0,
+      selectedItemColor: currentIndex >= 0 ? Colors.blue : Colors.grey,
+      unselectedItemColor: Colors.grey,
       onTap: (index) {
         switch (index) {
           case 0:
