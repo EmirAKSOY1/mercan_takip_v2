@@ -3,6 +3,10 @@ import 'screens/splash_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/help_screen.dart';
+import 'screens/settings_screen.dart';
+import 'screens/datas_screen.dart';
+import 'screens/alarms_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
@@ -34,6 +38,10 @@ class MyApp extends StatelessWidget {
         '/onboarding': (context) => const OnboardingScreen(),
         '/login': (context) => const LoginScreen(),
         '/home': (context) => const HomeScreen(),
+        '/help': (context) => const HelpScreen(),
+        '/settings': (context) => const SettingsScreen(),
+        '/datas': (context) => const DatasScreen(),
+        '/alarms': (context) => const AlarmsScreen(),
       },
     );
   }

@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:mercan_takip_v2/screens/sensor_data_screen.dart';
+import 'package:mercan_takip_v2/widgets/app_drawer.dart';
+import 'package:mercan_takip_v2/widgets/bottom_nav_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -99,163 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
     
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      drawer: Drawer(
-        child: Container(
-          color: Colors.white,
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          'MERCAN',
-                          style: TextStyle(
-                            color: Colors.indigo[900],
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          'TAKIP',
-                          style: TextStyle(
-                            color: Colors.orange[700],
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              _buildDrawerItem(
-                icon: Icons.dashboard_rounded,
-                title: 'Dashboard',
-                isSelected: true,
-                onTap: () => Navigator.pop(context),
-              ),
-              _buildDrawerItem(
-                icon: Icons.analytics_rounded,
-                title: 'İstatistikler',
-                isSelected: false,
-                onTap: () {
-                  Navigator.pop(context);
-                  // TODO: Navigate to analytics page
-                },
-              ),
-              _buildDrawerItem(
-                icon: Icons.calendar_today_rounded,
-                title: 'Kümes Takvimi',
-                isSelected: false,
-                onTap: () {
-                  Navigator.pop(context);
-                  // TODO: Navigate to schedule page
-                },
-              ),
-              _buildDrawerItem(
-                icon: Icons.notifications_rounded,
-                title: 'Bildirimler',
-                isSelected: false,
-                onTap: () {
-                  Navigator.pop(context);
-                  // TODO: Navigate to notifications page
-                },
-              ),
-              _buildDrawerItem(
-                icon: Icons.device_hub_rounded,
-                title: 'Sensörler',
-                isSelected: false,
-                onTap: () {
-                  Navigator.pop(context);
-                  // TODO: Navigate to sensors page
-                },
-              ),
-              const SizedBox(height: 16),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24),
-                child: Text(
-                  'Diğer',
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              _buildDrawerItem(
-                icon: Icons.archive_rounded,
-                title: 'Arşiv',
-                isSelected: false,
-                onTap: () {
-                  Navigator.pop(context);
-                  // TODO: Navigate to archives page
-                },
-              ),
-              _buildDrawerItem(
-                icon: Icons.settings_rounded,
-                title: 'Ayarlar',
-                isSelected: false,
-                onTap: () {
-                  Navigator.pop(context);
-                  // TODO: Navigate to settings page
-                },
-              ),
-              _buildDrawerItem(
-                icon: Icons.help_outline_rounded,
-                title: 'Yardım',
-                isSelected: false,
-                onTap: () {
-                  Navigator.pop(context);
-                  // TODO: Navigate to help page
-                },
-              ),
-              _buildDrawerItem(
-                icon: Icons.logout_rounded,
-                title: 'Çıkış Yap',
-                isSelected: false,
-                onTap: () {
-                  Navigator.pop(context);
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      title: const Text('Çıkış Yap'),
-                      content: const Text('Çıkış yapmak istediğinize emin misiniz?'),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('İptal'),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            _handleLogout();
-                          },
-                          child: const Text(
-                            'Çıkış Yap',
-                            style: TextStyle(color: Colors.red),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
+      drawer: const AppDrawer(currentRoute: '/home'),
       appBar: AppBar(
         leading: Builder(
           builder: (context) => IconButton(
@@ -460,23 +306,7 @@ class _HomeScreenState extends State<HomeScreen> {
           )).toList(),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Ana Sayfa',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bookmark_border),
-            label: 'Kayıtlar',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications_outlined),
-            label: 'Bildirimler',
-          ),
-        ],
-      ),
+      bottomNavigationBar: const BottomNavBar(currentIndex: 0),
     );
   }
 
@@ -631,33 +461,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildDrawerItem({
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-    required bool isSelected,
-  }) {
-    return ListTile(
-      leading: Icon(
-        icon,
-        color: isSelected ? Colors.indigo[900] : Colors.grey[600],
-        size: 22,
-      ),
-      title: Text(
-        title,
-        style: TextStyle(
-          color: isSelected ? Colors.indigo[900] : Colors.grey[800],
-          fontSize: 15,
-          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-        ),
-      ),
-      onTap: onTap,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-      visualDensity: const VisualDensity(horizontal: -4, vertical: -2),
-      dense: true,
     );
   }
 }
