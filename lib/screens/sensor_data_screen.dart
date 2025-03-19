@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:mercan_takip_v2/widgets/app_drawer.dart';
 import 'package:mercan_takip_v2/widgets/bottom_nav_bar.dart';
+import 'package:mercan_takip_v2/services/auth_service.dart';
 
 class DashedLinePainter extends CustomPainter {
   final Size screenSize;
@@ -123,164 +124,270 @@ class DashedLinePainter extends CustomPainter {
   bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
 
-class SensorDataScreen2 extends StatelessWidget {
+class SensorDataScreen2 extends StatefulWidget {
   final String coopId;
+  final String coopName;
 
-  SensorDataScreen2({required this.coopId});
+  const SensorDataScreen2({
+    Key? key,
+    required this.coopId,
+    required this.coopName,
+  }) : super(key: key);
 
-  Future<List<dynamic>> _fetchSensorData() async {
-    final response = await http.get(Uri.parse('http://62.171.140.229/api/getSensorData?coopId=$coopId'));
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Failed to load sensor data');
+  @override
+  State<SensorDataScreen2> createState() => _SensorDataScreen2State();
+}
+
+class _SensorDataScreen2State extends State<SensorDataScreen2> {
+  bool _isLoading = true;
+  Map<String, dynamic>? _sensorData;
+  final AuthService _authService = AuthService();
+  String? _integrationName;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadIntegrationName();
+    _fetchSensorData();
+  }
+
+  Future<void> _loadIntegrationName() async {
+    final integrationName = await _authService.getIntegrationName();
+    if (mounted) {
+      setState(() {
+        _integrationName = integrationName;
+      });
+    }
+  }
+
+  Future<void> _fetchSensorData() async {
+    try {
+      print('Fetching sensor data for coopId: ${widget.coopId}');
+      
+      // Token'ı al
+      final token = await _authService.getToken();
+      if (token == null) {
+        print('Token bulunamadı');
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, '/login');
+        }
+        return;
+      }
+
+      final response = await http.get(
+        Uri.parse('http://62.171.140.229/api/getSensorData?coopId=${widget.coopId}'),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      print('API Response Status Code: ${response.statusCode}');
+      print('API Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        print('Decoded Data: $data');
+        
+        if (mounted) {
+          setState(() {
+            _sensorData = {
+              'ic_sicaklik': data['ic_sicaklik']?.toString() ?? '0',
+              'dis_sicaklik': data['dis_sicaklik']?.toString() ?? '0',
+              'nem': data['nem']?.toString() ?? '0',
+              'co2': data['co2']?.toString() ?? '0',
+              'amonyak': data['amonyak']?.toString() ?? '0',
+              'olum_sayisi': data['olum_sayisi']?.toString() ?? '0',
+              'olum_orani': data['olum_orani']?.toString() ?? '0',
+              'su_tuketimi': data['su_tuketimi']?.toString() ?? '0',
+              'yem_tuketimi': data['yem_tuketimi']?.toString() ?? '0',
+              'gun': data['gun']?.toString() ?? '0',
+              'son_guncelleme': data['son_guncelleme']?.toString() ?? '',
+            };
+            _isLoading = false;
+          });
+          print('State updated with new data');
+        }
+      } else if (response.statusCode == 401) {
+        print('Token geçersiz veya süresi dolmuş');
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, '/login');
+        }
+      } else {
+        print('API Error: ${response.statusCode}');
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
+    } catch (e) {
+      print('Error fetching sensor data: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const AppDrawer(currentRoute: '/sensors'),
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu),
-            onPressed: () {
-              Scaffold.of(context).openDrawer();
-            },
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          _integrationName ?? 'Yükleniyor...',
+          style: const TextStyle(
+            color: Colors.black,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
           ),
         ),
-        title: Text('Agrokush'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.person),
-            onPressed: () {},
-          ),
-        ],
+        centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Kırmızı kart
-            Container(
-              margin: EdgeInsets.all(16),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Color(0xFFFF5252),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              padding: EdgeInsets.all(16),
+      drawer: const AppDrawer(currentRoute: '/sensors'),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
               child: Column(
                 children: [
-                  Text('Kümes-1', 
-                    style: TextStyle(
-                      color: Colors.white, 
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold
-                    )
-                  ),
-                  SizedBox(height: 4),
-                  Text('37. Gün', 
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16
-                    )
-                  ),
-                  SizedBox(height: 4),
-                  Text('12.03.2025 15:27', 
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14
-                    )
-                  ),
-                ],
-              ),
-            ),
-            
-            // Kümes resmi ve sensör verileri
-            Container(
-              height: MediaQuery.of(context).size.height * 0.5,
-              margin: EdgeInsets.symmetric(horizontal: 16),
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Positioned(
-                    top: 70,
-                    left: 0,
-                    right: 0,
-                    child: Image.asset(
-                      'assets/images/coop_image.png',
-                      fit: BoxFit.contain,
+                  // Kırmızı kart
+                  Container(
+                    margin: EdgeInsets.all(16),
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Color(0xFFFF5252),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        Text(
+                          widget.coopName,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          'SN: ${widget.coopId}',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: 4),
+                        Text('${_sensorData!['gun']}. Gün', 
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16
+                          )
+                        ),
+                        SizedBox(height: 4),
+                        Text(_sensorData!['son_guncelleme'], 
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14
+                          )
+                        ),
+                      ],
                     ),
                   ),
-                  // Dashed line for temperature
-                  Positioned.fill(
-                    child: CustomPaint(
-                      painter: DashedLinePainter(
-                        screenSize: MediaQuery.of(context).size,
-                      ),
+                  
+                  // Kümes resmi ve sensör verileri
+                  Container(
+                    height: MediaQuery.of(context).size.height * 0.5,
+                    margin: EdgeInsets.symmetric(horizontal: 16),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Positioned(
+                          top: 70,
+                          left: 0,
+                          right: 0,
+                          child: Image.asset(
+                            'assets/images/coop_image.png',
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                        Positioned.fill(
+                          child: CustomPaint(
+                            painter: DashedLinePainter(
+                              screenSize: MediaQuery.of(context).size,
+                            ),
+                          ),
+                        ),
+                        // İç Isı
+                        Positioned(
+                          top: MediaQuery.of(context).size.height * 0.08,
+                          left: MediaQuery.of(context).size.width * 0.1,
+                          child: _buildSensorIndicator('${_sensorData!['ic_sicaklik']}°C', 'İç Isı'),
+                        ),
+                        // CO2
+                        Positioned(
+                          top: MediaQuery.of(context).size.height * 0.02,
+                          right: MediaQuery.of(context).size.width * 0.05,
+                          child: _buildSensorIndicator('${_sensorData!['co2']} ppm', 'CO2'),
+                        ),
+                        // Dış Isı
+                        Positioned(
+                          bottom: MediaQuery.of(context).size.height * 0.15,
+                          left: MediaQuery.of(context).size.width * 0.1,
+                          child: _buildSensorIndicator('${_sensorData!['dis_sicaklik']}°C', 'Dış Isı'),
+                        ),
+                        // Nem
+                        Positioned(
+                          bottom: MediaQuery.of(context).size.height * 0.15,
+                          right: MediaQuery.of(context).size.width * 0.1,
+                          child: _buildSensorIndicator('%${_sensorData!['nem']}', 'Nem'),
+                        ),
+                      ],
                     ),
                   ),
-                  // İç Isı
-                  Positioned(
-                    top: MediaQuery.of(context).size.height * 0.08,
-                    left: MediaQuery.of(context).size.width * 0.1,
-                    child: _buildSensorIndicator('23°C', 'İç Isı'),
-                  ),
-                  // CO2
-                  Positioned(
-                    top: MediaQuery.of(context).size.height * 0.02,
-                    right: MediaQuery.of(context).size.width * 0.05,
-                    child: _buildSensorIndicator('23 ppm', 'CO2'),
-                  ),
-                  // Dış Isı
-                  Positioned(
-                    bottom: MediaQuery.of(context).size.height * 0.15,
-                    left: MediaQuery.of(context).size.width * 0.1,
-                    child: _buildSensorIndicator('23°C', 'Dış Isı'),
-                  ),
-                  // Nem
-                  Positioned(
-                    bottom: MediaQuery.of(context).size.height * 0.15,
-                    right: MediaQuery.of(context).size.width * 0.1,
-                    child: _buildSensorIndicator('%23', 'Nem'),
-                  ),
-                ],
-              ),
-            ),
 
-            // Alt kısımdaki kartlar
-            Container(
-              padding: EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _buildInfoCard('Ölüm Sayısı', '311', const Color.fromARGB(255, 196, 108, 108)!),
+                  // Alt kısımdaki kartlar
+                  Container(
+                    padding: EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: _buildInfoCard('Ölüm Sayısı', _sensorData!['olum_sayisi'], const Color.fromARGB(255, 196, 108, 108)!),
+                        ),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: _buildInfoCard('Ölüm Oranı', _sensorData!['olum_orani'], const Color.fromARGB(255, 99, 148, 110)!),
+                        ),
+                      ],
+                    ),
                   ),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: _buildInfoCard('Ölüm Oranı', '311', const Color.fromARGB(255, 99, 148, 110)!),
+                  Container(
+                    padding: EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: _buildInfoCard('Su Tüketimi', _sensorData!['su_tuketimi'], const Color.fromARGB(255, 70, 91, 109)!),
+                        ),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: _buildInfoCard('Yem Tüketimi', _sensorData!['yem_tuketimi'], const Color.fromARGB(255, 143, 111, 81)!),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
-            Container(
-              padding: EdgeInsets.only(left: 16, right: 16, bottom: 16),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _buildInfoCard('Su Tüketimi', '311', const Color.fromARGB(255, 70, 91, 109)!),
-                  ),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: _buildInfoCard('Yem Tüketimi', '311', const Color.fromARGB(255, 143, 111, 81)!),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
       bottomNavigationBar: const BottomNavBar(currentIndex: -1),
     );
   }

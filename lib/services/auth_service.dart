@@ -39,6 +39,11 @@ class AuthService {
         await prefs.setString('userSurname', user['surname']);
         await prefs.setString('userEmail', user['email']);
 
+        // Entegre adını kaydet (eğer API yanıtında varsa)
+        if (data['integration_name'] != null) {
+          await prefs.setString('integration_name', data['integration_name']);
+        }
+
         return {
           'status': true,
           'data': data,
@@ -126,6 +131,27 @@ class AuthService {
       final prefs = await SharedPreferences.getInstance();
       return prefs.getInt('userId');
     } catch (e) {
+      return null;
+    }
+  }
+
+  // Entegre adını kaydet
+  Future<void> saveIntegrationName(String name) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('integration_name', name);
+    } catch (e) {
+      print('Error saving integration name: $e');
+    }
+  }
+
+  // Entegre adını al
+  Future<String?> getIntegrationName() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString('integration_name');
+    } catch (e) {
+      print('Error getting integration name: $e');
       return null;
     }
   }

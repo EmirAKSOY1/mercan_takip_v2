@@ -113,11 +113,20 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       );
 
+      print('API Response Status Code: ${response.statusCode}');
+      print('API Response Body: ${response.body}');
+
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
+        print('Decoded Data: $data');
+        
         if (mounted) {
           setState(() {
-            _activeCoops = data.map((coop) => Coop.fromJson(coop)).toList();
+            _activeCoops = data.map((coop) {
+              print('Processing coop: $coop');
+              return Coop.fromJson(coop);
+            }).toList();
+            print('Processed Coops: $_activeCoops');
           });
         }
       } else if (response.statusCode == 401) {
@@ -127,6 +136,7 @@ class _HomeScreenState extends State<HomeScreen> {
         throw Exception('Failed to load active coops');
       }
     } catch (e) {
+      print('Error in _fetchActiveCoops: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Aktif kümesler yüklenirken hata oluştu: ${e.toString()}')),
@@ -359,7 +369,7 @@ class _HomeScreenState extends State<HomeScreen> {
               _buildCoopCard(
                 coopId: coop.id.toString(),
                 coopName: coop.name,
-                day: 15,
+                day: coop.day,
               ),
               const SizedBox(height: 16),
             ],
@@ -451,7 +461,10 @@ class _HomeScreenState extends State<HomeScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => SensorDataScreen2(coopId: coopId),
+            builder: (context) => SensorDataScreen2(
+              coopId: coopId,
+              coopName: coopName,
+            ),
           ),
         );
       },
@@ -528,18 +541,20 @@ class _HomeScreenState extends State<HomeScreen> {
 class Coop {
   final int id;
   final String name;
-  final String latitude;
-  final String longitude;
-  final int entegre_id;
+  final String? latitude;
+  final String? longitude;
+  final int? entegre_id;
+  final int day;
   final String? created_at;
   final String? updated_at;
 
   Coop({
     required this.id,
     required this.name,
-    required this.latitude,
-    required this.longitude,
-    required this.entegre_id,
+    this.latitude,
+    this.longitude,
+    this.entegre_id,
+    required this.day,
     this.created_at,
     this.updated_at,
   });
@@ -551,6 +566,7 @@ class Coop {
       latitude: json['latitude'],
       longitude: json['longitude'],
       entegre_id: json['entegre_id'],
+      day: json['day'] ?? 0,
       created_at: json['created_at'],
       updated_at: json['updated_at'],
     );
