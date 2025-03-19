@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mercan_takip_v2/services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,35 +15,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
   bool _isLoading = false;
-  String? _registeredEmail;
-  String? _registeredPassword;
-
-  // Sabit kullanıcı bilgileri (gerçek uygulamada bu bilgiler güvenli bir şekilde saklanmalıdır)
-  static const String defaultEmail = 'admin@admin.com';
-  static const String defaultPassword = '123456';
-
-  @override
-  void initState() {
-    super.initState();
-    _setDefaultCredentials();
-    _loadCredentials();
-  }
-
-  Future<void> _loadCredentials() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _registeredEmail = prefs.getString('registeredEmail');
-      _registeredPassword = prefs.getString('registeredPassword');
-    });
-  }
-
-  Future<void> _setDefaultCredentials() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (prefs.getString('registeredEmail') == null) {
-      await prefs.setString('registeredEmail', defaultEmail);
-      await prefs.setString('registeredPassword', defaultPassword);
-    }
-  }
+  final _authService = AuthService();
 
   @override
   void dispose() {
@@ -58,15 +31,12 @@ class _LoginScreenState extends State<LoginScreen> {
       });
 
       try {
-        final prefs = await SharedPreferences.getInstance();
-        final registeredEmail = prefs.getString('registeredEmail');
-        final registeredPassword = prefs.getString('registeredPassword');
+        final result = await _authService.login(
+          _emailController.text.trim(),
+          _passwordController.text,
+        );
 
-        if (_emailController.text.trim() == registeredEmail && 
-            _passwordController.text == registeredPassword) {
-          // Başarılı giriş
-          await prefs.setBool('isLoggedIn', true);
-          
+        if (result['status']) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -77,11 +47,10 @@ class _LoginScreenState extends State<LoginScreen> {
             Navigator.pushReplacementNamed(context, '/home');
           }
         } else {
-          // Başarısız giriş
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('E-posta veya şifre hatalı!'),
+              SnackBar(
+                content: Text(result['message']),
                 backgroundColor: Colors.red,
               ),
             );
@@ -189,7 +158,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             keyboardType: TextInputType.emailAddress,
                             decoration: InputDecoration(
                               labelText: 'E-posta',
-                              hintText: defaultEmail,
                               prefixIcon: const Icon(Icons.email_outlined),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -202,9 +170,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               if (!value.contains('@')) {
                                 return 'Geçerli bir e-posta adresi girin';
                               }
-                              if (_registeredEmail != null && value.trim() != _registeredEmail) {
-                                return 'E-posta adresi hatalı';
-                              }
                               return null;
                             },
                           ),
@@ -216,7 +181,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             obscureText: !_isPasswordVisible,
                             decoration: InputDecoration(
                               labelText: 'Şifre',
-                              hintText: '******',
                               prefixIcon: const Icon(Icons.lock_outline),
                               suffixIcon: IconButton(
                                 icon: Icon(
@@ -241,27 +205,12 @@ class _LoginScreenState extends State<LoginScreen> {
                               if (value.length < 6) {
                                 return 'Şifre en az 6 karakter olmalı';
                               }
-                              if (_registeredPassword != null && value != _registeredPassword) {
-                                return 'Şifre hatalı';
-                              }
                               return null;
                             },
                           ),
-                          const SizedBox(height: 8),
-
-                          // Şifremi Unuttum
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: TextButton(
-                              onPressed: () {
-                                // TODO: Şifremi unuttum sayfasına yönlendir
-                              },
-                              child: const Text('Şifremi Unuttum'),
-                            ),
-                          ),
                           const SizedBox(height: 24),
 
-                          // Giriş Yap butonu
+                          // Giriş butonu
                           ElevatedButton(
                             onPressed: _isLoading ? null : _handleLogin,
                             style: ElevatedButton.styleFrom(
@@ -286,32 +235,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         ],
                       ),
                     ),
-                  ),
-
-                  // Kayıt Ol linki
-                  const SizedBox(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Hesabınız yok mu?',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          // TODO: Kayıt ol sayfasına yönlendir
-                        },
-                        child: const Text(
-                          'Kayıt Ol',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
                   ),
                 ],
               ),

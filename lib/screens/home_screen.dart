@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:mercan_takip_v2/screens/sensor_data_screen.dart';
 import 'package:mercan_takip_v2/widgets/app_drawer.dart';
 import 'package:mercan_takip_v2/widgets/bottom_nav_bar.dart';
+import 'package:mercan_takip_v2/services/auth_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,55 +24,114 @@ class _HomeScreenState extends State<HomeScreen> {
   };
   bool _isLoading = true;
   List<Coop> _activeCoops = [];
+  String _userName = '';
+  final _authService = AuthService();
 
   @override
   void initState() {
     super.initState();
     _fetchGeneralData();
     _fetchActiveCoops();
+    _loadUserName();
+  }
+
+  Future<void> _loadUserName() async {
+    final userData = await _authService.getUserData();
+    if (mounted && userData != null) {
+      setState(() {
+        _userName = '${userData['name']}';
+      });
+    }
   }
 
   Future<void> _fetchGeneralData() async {
+    
     setState(() => _isLoading = true);
     try {
-      final response = await http.get(Uri.parse('http://62.171.140.229/api/getGeneralData'));
+
+      final token = await _authService.getToken();
+      if (token == null) {
+        throw Exception('Token bulunamadı');
+      }
+
+      final response = await http.get(
+        
+        Uri.parse('http://62.171.140.229/api/getGeneralData'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      );
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         setState(() {
           _generalData = {
-            'totalData': data['totalData'],
-            'totalAnimals': data['totalAnimals'],
-            'totalAlarms': data['totalAlarms'],
-            'totalCoops': data['totalCoops'],
+            'totalData': data['totalData']?.toString() ?? '0',
+            'totalAnimals': data['totalAnimals']?.toString() ?? '0',
+            'totalAlarms': data['totalAlarms']?.toString() ?? '0',
+            'totalCoops': data['totalCoops']?.toString() ?? '0',
           };
         });
+        print('API Response: $data'); // Debug için
+        print('Converted Data: $_generalData'); // Debug için
+      } else if (response.statusCode == 401) {
+        // Token geçersiz veya süresi dolmuş
+        Navigator.pushReplacementNamed(context, '/login');
       } else {
+        print('API Error Status Code: ${response.statusCode}'); // Debug için
+        print('API Error Body: ${response.body}'); // Debug için
         throw Exception('Failed to load data');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Veri yüklenirken hata oluştu: ${e.toString()}')),
-      );
+      print('Error in _fetchGeneralData: $e'); // Debug için
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Veri yüklenirken hata oluştu: ${e.toString()}')),
+        );
+      }
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
   Future<void> _fetchActiveCoops() async {
     try {
-      final response = await http.get(Uri.parse('http://62.171.140.229/api/getCoops'));
+      // Token'ı al
+      final token = await _authService.getToken();
+      if (token == null) {
+        throw Exception('Token bulunamadı');
+      }
+
+      final response = await http.get(
+        Uri.parse('http://62.171.140.229/api/getCoops'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      );
+
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-        setState(() {
-          _activeCoops = data.map((coop) => Coop.fromJson(coop)).toList();
-        });
+        if (mounted) {
+          setState(() {
+            _activeCoops = data.map((coop) => Coop.fromJson(coop)).toList();
+          });
+        }
+      } else if (response.statusCode == 401) {
+        // Token geçersiz veya süresi dolmuş
+        Navigator.pushReplacementNamed(context, '/login');
       } else {
         throw Exception('Failed to load active coops');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Aktif kümesler yüklenirken hata oluştu: ${e.toString()}')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Aktif kümesler yüklenirken hata oluştu: ${e.toString()}')),
+        );
+      }
     }
   }
 
@@ -116,9 +176,9 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Row(
               children: [
-                const Text(
-                  'Merhaba, Agrokush',
-                  style: TextStyle(
+                Text(
+                  'Merhaba, $_userName',
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
@@ -269,7 +329,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       icon: Icons.warning,
                       iconColor: Colors.red,
                       title: _generalData['totalAlarms'],
-                      subtitle: 'Bugün Alarm',
+                      subtitle: 'Toplam Alarm',
                       backgroundColor: Colors.red.withOpacity(0.1),
                     ),
                     _buildStatCard(
@@ -297,11 +357,11 @@ class _HomeScreenState extends State<HomeScreen> {
           ..._activeCoops.map((coop) => Column(
             children: [
               _buildCoopCard(
-                coopId: coop.coopId,
-                coopName: coop.coopName,
-                day: coop.day,
+                coopId: coop.id.toString(),
+                coopName: coop.name,
+                day: 15,
               ),
-              const SizedBox(height: 16), // 16 piksel boşluk
+              const SizedBox(height: 16),
             ],
           )).toList(),
         ],
@@ -448,7 +508,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              coopId,
+              'Seri No: $coopId',
               style: TextStyle(
                 color: Colors.grey[600],
                 fontSize: 14,
@@ -466,17 +526,33 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class Coop {
-  final String coopId;
-  final String coopName;
-  final int day;
+  final int id;
+  final String name;
+  final String latitude;
+  final String longitude;
+  final int entegre_id;
+  final String? created_at;
+  final String? updated_at;
 
-  Coop({required this.coopId, required this.coopName, required this.day});
+  Coop({
+    required this.id,
+    required this.name,
+    required this.latitude,
+    required this.longitude,
+    required this.entegre_id,
+    this.created_at,
+    this.updated_at,
+  });
 
   factory Coop.fromJson(Map<String, dynamic> json) {
     return Coop(
-      coopId: json['coopId'],
-      coopName: json['coopName'],
-      day: json['day'],
+      id: json['id'],
+      name: json['name'],
+      latitude: json['latitude'],
+      longitude: json['longitude'],
+      entegre_id: json['entegre_id'],
+      created_at: json['created_at'],
+      updated_at: json['updated_at'],
     );
   }
 }
