@@ -69,7 +69,16 @@ class AppDrawer extends StatelessWidget {
                 Navigator.pop(context);
               },
             ),
+            _buildDrawerItem(
+              icon: Icons.bookmark_rounded,
+              title: 'Kayıtlar',
+              isSelected: currentRoute == '/datas',
+              onTap: () {
 
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/datas');
+              },
+            ),
             _buildDrawerItem(
               icon: Icons.notifications_rounded,
               title: 'Alarmlar',
