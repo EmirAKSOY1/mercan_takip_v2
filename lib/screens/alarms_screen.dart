@@ -388,66 +388,95 @@ class _AlarmsScreenState extends State<AlarmsScreen> {
             // Sayfalama Kontrolleri
             if (_totalItems > _itemsPerPage)
               Container(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildPageButton(
-                      icon: Icons.first_page,
-                      onPressed: _currentPage > 0
-                          ? () {
-                              setState(() {
-                                _currentPage = 0;
-                              });
-                              _fetchAlarms();
-                            }
-                          : null,
-                    ),
-                    const SizedBox(width: 8),
-                    _buildPageButton(
-                      icon: Icons.chevron_left,
-                      onPressed: _currentPage > 0
-                          ? () {
-                              setState(() {
-                                _currentPage--;
-                              });
-                              _fetchAlarms();
-                            }
-                          : null,
-                    ),
-                    const SizedBox(width: 16),
-                    Text(
-                      'Sayfa ${_currentPage + 1} / ${(_totalItems / _itemsPerPage).ceil()}',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    _buildPageButton(
-                      icon: Icons.chevron_right,
-                      onPressed: (_currentPage + 1) * _itemsPerPage < _totalItems
-                          ? () {
-                              setState(() {
-                                _currentPage++;
-                              });
-                              _fetchAlarms();
-                            }
-                          : null,
-                    ),
-                    const SizedBox(width: 8),
-                    _buildPageButton(
-                      icon: Icons.last_page,
-                      onPressed: (_currentPage + 1) * _itemsPerPage < _totalItems
-                          ? () {
-                              setState(() {
-                                _currentPage = (_totalItems / _itemsPerPage).ceil() - 1;
-                              });
-                              _fetchAlarms();
-                            }
-                          : null,
-                    ),
-                  ],
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final buttonSize = constraints.maxWidth < 600 ? 36.0 : 40.0;
+                    final iconSize = constraints.maxWidth < 600 ? 18.0 : 20.0;
+                    final fontSize = constraints.maxWidth < 600 ? 14.0 : 16.0;
+                    
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildPageButton(
+                          icon: Icons.first_page,
+                          iconSize: iconSize,
+                          buttonSize: buttonSize,
+                          onPressed: _currentPage > 0
+                              ? () {
+                                  setState(() {
+                                    _currentPage = 0;
+                                  });
+                                  _fetchAlarms();
+                                }
+                              : null,
+                          tooltip: 'İlk Sayfa',
+                        ),
+                        const SizedBox(width: 8),
+                        _buildPageButton(
+                          icon: Icons.chevron_left,
+                          iconSize: iconSize,
+                          buttonSize: buttonSize,
+                          onPressed: _currentPage > 0
+                              ? () {
+                                  setState(() {
+                                    _currentPage--;
+                                  });
+                                  _fetchAlarms();
+                                }
+                              : null,
+                          tooltip: 'Önceki Sayfa',
+                        ),
+                        const SizedBox(width: 16),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.red[50],
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.red[100]!),
+                          ),
+                          child: Text(
+                            'Sayfa ${_currentPage + 1}/${(_totalItems / _itemsPerPage).ceil()}',
+                            style: TextStyle(
+                              fontSize: fontSize,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.red[700],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        _buildPageButton(
+                          icon: Icons.chevron_right,
+                          iconSize: iconSize,
+                          buttonSize: buttonSize,
+                          onPressed: (_currentPage + 1) * _itemsPerPage < _totalItems && _totalItems > _itemsPerPage
+                              ? () {
+                                  setState(() {
+                                    _currentPage++;
+                                  });
+                                  _fetchAlarms();
+                                }
+                              : null,
+                          tooltip: 'Sonraki Sayfa',
+                        ),
+                        const SizedBox(width: 8),
+                        _buildPageButton(
+                          icon: Icons.last_page,
+                          iconSize: iconSize,
+                          buttonSize: buttonSize,
+                          onPressed: (_currentPage + 1) * _itemsPerPage < _totalItems && _totalItems > _itemsPerPage
+                              ? () {
+                                  setState(() {
+                                    _currentPage = (_totalItems / _itemsPerPage).ceil() - 1;
+                                  });
+                                  _fetchAlarms();
+                                }
+                              : null,
+                          tooltip: 'Son Sayfa',
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ),
           ],
@@ -459,23 +488,38 @@ class _AlarmsScreenState extends State<AlarmsScreen> {
 
   Widget _buildPageButton({
     required IconData icon,
+    required double iconSize,
+    required double buttonSize,
     required VoidCallback? onPressed,
+    required String tooltip,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: onPressed != null ? Colors.red[50] : Colors.grey[200],
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: IconButton(
-        icon: Icon(
-          icon,
-          color: onPressed != null ? Colors.red : Colors.grey,
-          size: 20,
+    return Tooltip(
+      message: tooltip,
+      child: Container(
+        decoration: BoxDecoration(
+          color: onPressed != null ? Colors.red[50] : Colors.grey[100],
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: onPressed != null ? Colors.red[100]! : Colors.grey[300]!,
+            width: 1,
+          ),
         ),
-        onPressed: onPressed,
-        constraints: const BoxConstraints(
-          minWidth: 36,
-          minHeight: 36,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: onPressed,
+            child: Container(
+              width: buttonSize,
+              height: buttonSize,
+              alignment: Alignment.center,
+              child: Icon(
+                icon,
+                color: onPressed != null ? Colors.red[700] : Colors.grey[400],
+                size: iconSize,
+              ),
+            ),
+          ),
         ),
       ),
     );

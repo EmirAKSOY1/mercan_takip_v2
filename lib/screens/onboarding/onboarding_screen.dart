@@ -20,7 +20,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     ),
     OnboardingPageData(
       title: 'Akıllı Çözümlerle Geleceğe!',
-      description: 'Yapay zeka desteğiyle kümesinizi daha verimli yönetin, verileri analiz edin ve en iyi kararları alın. 🤖',
+      description: 'Yapay zeka desteğiyle kümesinizi daha verimli yönetin ve en iyi kararları alın. 🤖',
       image: 'assets/images/onboarding2.png',
     ),
     OnboardingPageData(
@@ -87,61 +87,69 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               },
             ),
             Positioned(
-              bottom: 50,
+              bottom: 0,
               left: 0,
               right: 0,
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(
-                      pages.length,
-                      (index) => AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        height: 8,
-                        width: _currentPage == index ? 24 : 8,
-                        decoration: BoxDecoration(
-                          color: _currentPage == index
-                              ? Theme.of(context).primaryColor
-                              : Colors.grey.shade300,
-                          borderRadius: BorderRadius.circular(4),
+              child: Container(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).padding.bottom + 16,
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(
+                        pages.length,
+                        (index) => AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          height: 8,
+                          width: _currentPage == index ? 24 : 8,
+                          decoration: BoxDecoration(
+                            color: _currentPage == index
+                                ? Theme.of(context).primaryColor
+                                : Colors.grey.shade300,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 32),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        if (_currentPage < pages.length - 1)
-                          TextButton(
-                            onPressed: _onSkipPressed,
-                            child: const Text('Geç'),
-                          ),
-                        if (_currentPage < pages.length - 1)
-                          ElevatedButton(
-                            onPressed: _onNextPressed,
-                            child: const Text('Sonraki'),
-                          )
-                        else
-                          Expanded(
-                            child: Center(
-                              child: ElevatedButton(
-                                onPressed: _onSkipPressed,
-                                style: ElevatedButton.styleFrom(
-                                  minimumSize: const Size(200, 48),
+                    const SizedBox(height: 24),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          if (_currentPage < pages.length - 1)
+                            TextButton(
+                              onPressed: _onSkipPressed,
+                              child: const Text('Geç'),
+                            ),
+                          if (_currentPage < pages.length - 1)
+                            ElevatedButton(
+                              onPressed: _onNextPressed,
+                              style: ElevatedButton.styleFrom(
+                                minimumSize: const Size(120, 48),
+                              ),
+                              child: const Text('Sonraki'),
+                            )
+                          else
+                            Expanded(
+                              child: Center(
+                                child: ElevatedButton(
+                                  onPressed: _onSkipPressed,
+                                  style: ElevatedButton.styleFrom(
+                                    minimumSize: const Size(200, 48),
+                                  ),
+                                  child: const Text('Başla'),
                                 ),
-                                child: const Text('Başla'),
                               ),
                             ),
-                          ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],

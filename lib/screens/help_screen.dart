@@ -72,15 +72,19 @@ class HelpScreen extends StatelessWidget {
           const SizedBox(height: 16),
           _buildFAQItem(
             question: 'Kümes verilerini nasıl görüntüleyebilirim?',
-            answer: 'Ana sayfadaki "Aktif Kümesler" bölümünden ilgili kümesi seçerek detaylı verileri görüntüleyebilirsiniz.',
+            answer: 'Ana sayfadaki "Aktif Kümesler" bölümünden ilgili kümesi seçerek detaylı verileri görüntüleyebilirsiniz. Her kümes için sıcaklık, nem ve diğer sensör verilerini gerçek zamanlı olarak takip edebilirsiniz.',
           ),
           _buildFAQItem(
-            question: 'Sensör verilerini nasıl takip edebilirim?',
-            answer: 'Kümes detay sayfasında sensör verilerini gerçek zamanlı olarak takip edebilirsiniz. Veriler otomatik olarak güncellenir.',
+            question: 'Alarmları nasıl takip edebilirim?',
+            answer: 'Alarmlar sayfasından tüm alarmlarınızı görüntüleyebilirsiniz. Kümes ve tarih bazlı filtreleme yaparak istediğiniz alarmları bulabilirsiniz. Ayrıca ana sayfadaki günlük özet kartından günlük alarm sayısını görebilirsiniz.',
           ),
           _buildFAQItem(
-            question: 'Bildirimleri nasıl yönetebilirim?',
-            answer: 'Bildirimler sayfasından tüm bildirimlerinizi görüntüleyebilir ve yönetebilirsiniz.',
+            question: 'Kayıtları nasıl filtreleyebilirim?',
+            answer: 'Kayıtlar sayfasında kümes seçimi ve tarih aralığı belirleyerek filtreleme yapabilirsiniz. Ayrıca sayfalama özelliği ile kayıtları daha kolay inceleyebilirsiniz.',
+          ),
+          _buildFAQItem(
+            question: 'İstatistikleri nasıl görüntüleyebilirim?',
+            answer: 'İstatistikler sayfasından genel istatistikleri ve grafikleri görüntüleyebilirsiniz. Kümes bazlı filtreleme yaparak detaylı analizler elde edebilirsiniz.',
           ),
           const SizedBox(height: 24),
 
@@ -96,21 +100,53 @@ class HelpScreen extends StatelessWidget {
           _buildContactItem(
             icon: Icons.email_outlined,
             title: 'E-posta',
-            subtitle: 'destek@mercantakip.com',
-            onTap: () {},
+            subtitle: 'info@mercantakip.com',
+            onTap: () {
+              // E-posta gönderme işlemi
+            },
           ),
           const SizedBox(height: 12),
           _buildContactItem(
             icon: Icons.phone_outlined,
             title: 'Telefon',
-            subtitle: '+90 555 123 4567',
-            onTap: () {},
+            subtitle: '+90 850 123 4567',
+            onTap: () {
+              // Telefon arama işlemi
+            },
           ),
           const SizedBox(height: 12),
           _buildContactItem(
             icon: Icons.chat_outlined,
             title: 'Canlı Destek',
-            subtitle: '7/24 Hizmetinizdeyiz',
+            subtitle: 'Pazartesi - Cumartesi: 09:00 - 18:00',
+            onTap: () {
+              // Canlı destek başlatma işlemi
+            },
+          ),
+          const SizedBox(height: 24),
+
+          // Destek Merkezi
+          const Text(
+            'Destek Merkezi',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          _buildContactItem(
+            icon: Icons.location_on_outlined,
+            title: 'Adres',
+            subtitle: 'Merkez Mahallesi, Teknoloji Caddesi No:123\n34000 İstanbul',
+            onTap: () {
+              // Harita açma işlemi
+            },
+          ),
+          const SizedBox(height: 12),
+          _buildContactItem(
+            icon: Icons.access_time,
+            title: 'Çalışma Saatleri',
+            subtitle: 'Pazartesi - Cumartesi: 09:00 - 18:00\nPazar: Kapalı',
             onTap: () {},
           ),
         ],

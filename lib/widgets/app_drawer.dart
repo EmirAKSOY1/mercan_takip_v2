@@ -59,14 +59,15 @@ class AppDrawer extends StatelessWidget {
               },
             ),
             _buildDrawerItem(
-              icon: Icons.analytics_rounded,
+              icon: Icons.bar_chart,
               title: 'İstatistikler',
-              isSelected: currentRoute == '/analytics',
+              isSelected: currentRoute == '/statistics',
               onTap: () {
-                if (currentRoute != '/analytics') {
-                  Navigator.pushReplacementNamed(context, '/analytics');
-                }
-                Navigator.pop(context);
+                
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/statistics');
+                
+                
               },
             ),
             _buildDrawerItem(

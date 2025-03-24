@@ -21,6 +21,9 @@ class _HomeScreenState extends State<HomeScreen> {
     'totalAnimals': '0',
     'totalAlarms': '0',
     'totalCoops': '0',
+    'avgTemperature': '0',
+    'avgHumidity': '0',
+    'dailyAlarms': '0',
   };
   bool _isLoading = true;
   List<Coop> _activeCoops = [];
@@ -45,17 +48,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _fetchGeneralData() async {
-    
     setState(() => _isLoading = true);
     try {
-
       final token = await _authService.getToken();
       if (token == null) {
         throw Exception('Token bulunamadı');
       }
 
       final response = await http.get(
-        
         Uri.parse('http://62.171.140.229/api/getGeneralData'),
         headers: {
           'Authorization': 'Bearer $token',
@@ -71,6 +71,9 @@ class _HomeScreenState extends State<HomeScreen> {
             'totalAnimals': data['totalAnimals']?.toString() ?? '0',
             'totalAlarms': data['totalAlarms']?.toString() ?? '0',
             'totalCoops': data['totalCoops']?.toString() ?? '0',
+            'avgTemperature': data['avgTemperature']?.toString() ?? '0',
+            'avgHumidity': data['avgHumidity']?.toString() ?? '0',
+            'dailyAlarms': data['dailyAlarms']?.toString() ?? '0',
           };
         });
         print('API Response: $data'); // Debug için
@@ -226,155 +229,178 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
-        actions: [
-          Stack(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.notifications_outlined),
-                onPressed: () {
-                  // TODO: Implement notifications
-                },
-              ),
-              Positioned(
-                right: 8,
-                top: 8,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Text(
-                    '2',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _fetchGeneralData,
-          ),
-        ],
+
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          // Hava Durumu
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await Future.wait([
+            _fetchGeneralData(),
+            _fetchActiveCoops(),
+          ]);
+        },
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            // Günlük Özet Kartı
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.red[900]!, Colors.red[700]!],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-              ],
-            ),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.wb_sunny,
-                  color: Colors.orange,
-                  size: 32,
-                ),
-                const SizedBox(width: 16),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '$currentDay, 20°C',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      'Güneşli',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // İstatistik Kartları
-          _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : GridView.count(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 16,
-                  crossAxisSpacing: 16,
-                  childAspectRatio: 1.2,
-                  children: [
-                    _buildStatCard(
-                      icon: Icons.data_usage,
-                      iconColor: Colors.blue,
-                      title: _generalData['totalData'],
-                      subtitle: 'Toplam Veri',
-                      backgroundColor: Colors.blue.withOpacity(0.1),
-                    ),
-                    _buildStatCard(
-                      icon: Icons.pets,
-                      iconColor: Colors.green,
-                      title: _generalData['totalAnimals'],
-                      subtitle: 'Toplam Hayvan',
-                      backgroundColor: Colors.green.withOpacity(0.1),
-                    ),
-                    _buildStatCard(
-                      icon: Icons.warning,
-                      iconColor: Colors.red,
-                      title: _generalData['totalAlarms'],
-                      subtitle: 'Toplam Alarm',
-                      backgroundColor: Colors.red.withOpacity(0.1),
-                    ),
-                    _buildStatCard(
-                      icon: Icons.home,
-                      iconColor: Colors.purple,
-                      title: _generalData['totalCoops'],
-                      subtitle: 'Toplam Kümes',
-                      backgroundColor: Colors.purple.withOpacity(0.1),
-                    ),
-                  ],
-                ),
-          const SizedBox(height: 24),
-
-          // Aktif Kümesler Başlığı
-          const Text(
-            'Aktif Kümesler',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Aktif Kümesler Listesi
-          ..._activeCoops.map((coop) => Column(
-            children: [
-              _buildCoopCard(
-                coopId: coop.id.toString(),
-                coopName: coop.name,
-                day: coop.day,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.red[900]!.withOpacity(0.3),
+                    spreadRadius: 1,
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-              const SizedBox(height: 16),
-            ],
-          )).toList(),
-        ],
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Günlük Özet',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          DateFormat('dd.MM.yyyy').format(DateTime.now()),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildSummaryItem(
+                        icon: Icons.thermostat,
+                        label: 'Ort. Sıcaklık',
+                        value: '${_generalData['avgTemperature']}°C',
+                      ),
+                      _buildSummaryItem(
+                        icon: Icons.water_drop,
+                        label: 'Ort. Nem',
+                        value: '%${_generalData['avgHumidity']}',
+                      ),
+                      _buildSummaryItem(
+                        icon: Icons.warning,
+                        label: 'Uyarılar',
+                        value: _generalData['dailyAlarms'],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            // İstatistik Kartları
+            _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : LayoutBuilder(
+                    builder: (context, constraints) {
+                      // Ekran genişliğine göre kart genişliğini belirle
+                      final cardWidth = constraints.maxWidth < 600 
+                          ? (constraints.maxWidth - 24) / 2 
+                          : (constraints.maxWidth - 24) / 4;
+                      
+                      return Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          SizedBox(
+                            width: cardWidth,
+                            child: _buildStatCard(
+                              icon: Icons.data_usage,
+                              iconColor: Colors.blue,
+                              title: _generalData['totalData'],
+                              subtitle: 'Toplam Veri',
+                              backgroundColor: Colors.blue.withOpacity(0.1),
+                            ),
+                          ),
+                          SizedBox(
+                            width: cardWidth,
+                            child: _buildStatCard(
+                              icon: Icons.pets,
+                              iconColor: Colors.green,
+                              title: _generalData['totalAnimals'],
+                              subtitle: 'Toplam Hayvan',
+                              backgroundColor: Colors.green.withOpacity(0.1),
+                            ),
+                          ),
+                          SizedBox(
+                            width: cardWidth,
+                            child: _buildStatCard(
+                              icon: Icons.warning,
+                              iconColor: Colors.red,
+                              title: _generalData['totalAlarms'],
+                              subtitle: 'Toplam Alarm',
+                              backgroundColor: Colors.red.withOpacity(0.1),
+                            ),
+                          ),
+                          SizedBox(
+                            width: cardWidth,
+                            child: _buildStatCard(
+                              icon: Icons.home,
+                              iconColor: Colors.purple,
+                              title: _generalData['totalCoops'],
+                              subtitle: 'Toplam Kümes',
+                              backgroundColor: Colors.purple.withOpacity(0.1),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+            const SizedBox(height: 24),
+
+            // Aktif Kümesler Başlığı
+            const Text(
+              'Aktif Kümesler',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Aktif Kümesler Listesi
+            ..._activeCoops.map((coop) => Column(
+              children: [
+                _buildCoopCard(
+                  coopId: coop.id.toString(),
+                  coopName: coop.name,
+                  day: coop.day,
+                ),
+                const SizedBox(height: 16),
+              ],
+            )).toList(),
+          ],
+        ),
       ),
       bottomNavigationBar: const BottomNavBar(currentIndex: 0),
     );
@@ -388,23 +414,24 @@ class _HomeScreenState extends State<HomeScreen> {
     required Color backgroundColor,
   }) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: backgroundColor,
               shape: BoxShape.circle,
@@ -412,16 +439,19 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Icon(
               icon,
               color: iconColor,
-              size: 24,
+              size: 20,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           Text(
             title,
             style: const TextStyle(
-              fontSize: 24,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
           ),
           const SizedBox(height: 4),
           Text(
@@ -430,6 +460,9 @@ class _HomeScreenState extends State<HomeScreen> {
               color: Colors.grey[600],
               fontSize: 14,
             ),
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
           ),
         ],
       ),
@@ -534,6 +567,45 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSummaryItem({
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(
+            icon,
+            color: Colors.white,
+            size: 24,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          label,
+          style: TextStyle(
+            color: Colors.white.withOpacity(0.8),
+            fontSize: 12,
+          ),
+        ),
+      ],
     );
   }
 }

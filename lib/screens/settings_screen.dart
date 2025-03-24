@@ -69,6 +69,13 @@ class SettingsScreen extends StatelessWidget {
             subtitle: 'Ad, soyad ve iletişim bilgilerinizi güncelleyin',
             onTap: () {},
           ),
+          const SizedBox(height: 12),
+          _buildSettingCard(
+            icon: Icons.lock_outline,
+            title: 'Şifre Değiştir',
+            subtitle: 'Hesap şifrenizi güncelleyin',
+            onTap: () {},
+          ),
           const SizedBox(height: 24),
 
           // Uygulama Ayarları
@@ -88,30 +95,15 @@ class SettingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          // Gizlilik ve Güvenlik
-          _buildSectionTitle('Gizlilik ve Güvenlik'),
-          _buildSettingCard(
-            icon: Icons.lock_outline,
-            title: 'Şifre Değiştir',
-            subtitle: 'Hesap şifrenizi güncelleyin',
-            onTap: () {},
-          ),
-          const SizedBox(height: 12),
-          _buildSettingCard(
-            icon: Icons.security,
-            title: 'İki Faktörlü Doğrulama',
-            subtitle: 'Hesap güvenliğinizi artırın',
-            onTap: () {},
-          ),
-          const SizedBox(height: 24),
-
           // Diğer
           _buildSectionTitle('Diğer'),
           _buildSettingCard(
             icon: Icons.info_outline,
             title: 'Hakkında',
             subtitle: 'Uygulama versiyonu ve lisans bilgileri',
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, '/about');
+            },
           ),
           const SizedBox(height: 12),
           _buildSettingCard(

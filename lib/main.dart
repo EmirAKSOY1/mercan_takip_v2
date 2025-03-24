@@ -7,6 +7,8 @@ import 'screens/help_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/datas_screen.dart';
 import 'screens/alarms_screen.dart';
+import 'screens/statistics_screen.dart';
+import 'screens/about_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
@@ -42,6 +44,8 @@ class MyApp extends StatelessWidget {
         '/settings': (context) => const SettingsScreen(),
         '/datas': (context) => const DatasScreen(),
         '/alarms': (context) => const AlarmsScreen(),
+        '/statistics': (context) => const StatisticsScreen(),
+        '/about': (context) => const AboutScreen(),
       },
     );
   }
