@@ -67,17 +67,18 @@ class _HomeScreenState extends State<HomeScreen> {
         final data = json.decode(response.body);
         setState(() {
           _generalData = {
+            /*
             'totalData': data['totalData']?.toString() ?? '0',
             'totalAnimals': data['totalAnimals']?.toString() ?? '0',
             'totalAlarms': data['totalAlarms']?.toString() ?? '0',
             'totalCoops': data['totalCoops']?.toString() ?? '0',
+            */
             'avgTemperature': data['avgTemperature']?.toString() ?? '0',
             'avgHumidity': data['avgHumidity']?.toString() ?? '0',
             'dailyAlarms': data['dailyAlarms']?.toString() ?? '0',
           };
         });
-        print('API Response: $data'); // Debug için
-        print('Converted Data: $_generalData'); // Debug için
+
       } else if (response.statusCode == 401) {
         // Token geçersiz veya süresi dolmuş
         Navigator.pushReplacementNamed(context, '/login');
@@ -199,7 +200,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(width: 4),
                 const Icon(Icons.waving_hand, color: Colors.amber),
               ],
-            ),
+            ),/*
             Row(
               children: [
                 Container(
@@ -226,7 +227,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ],
-            ),
+            ),*/
           ],
         ),
 
@@ -284,7 +285,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
-                          DateFormat('dd.MM.yyyy').format(DateTime.now()),
+                          DateFormat('dd.MM.yyyy HH:mm').format(DateTime.now()),
+                          //DateFormat('dd.MM.yyyy').format(DateTime.now()),
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 14,
@@ -299,17 +301,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       _buildSummaryItem(
                         icon: Icons.thermostat,
-                        label: 'Ort. Sıcaklık',
+                        label: 'Dış Sıcaklık',
                         value: '${_generalData['avgTemperature']}°C',
                       ),
-                      _buildSummaryItem(
-                        icon: Icons.water_drop,
-                        label: 'Ort. Nem',
-                        value: '%${_generalData['avgHumidity']}',
-                      ),
+
                       _buildSummaryItem(
                         icon: Icons.warning,
-                        label: 'Uyarılar',
+                        label: 'Bugün Alarm',
                         value: _generalData['dailyAlarms'],
                       ),
                     ],
@@ -318,6 +316,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 24),
+            /*
             // İstatistik Kartları
             _isLoading
                 ? const Center(child: CircularProgressIndicator())
@@ -376,6 +375,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                     },
                   ),
+                  */
             const SizedBox(height: 24),
 
             // Aktif Kümesler Başlığı

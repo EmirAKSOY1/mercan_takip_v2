@@ -19,10 +19,10 @@ class BottomNavBar extends StatelessWidget {
           case 0:
             Navigator.pushReplacementNamed(context, '/home');
             break;
-          case 1:
+          /*case 1:
             Navigator.pushReplacementNamed(context, '/datas');
-            break;
-          case 2:
+            break;*/
+          case 1:
             Navigator.pushReplacementNamed(context, '/alarms');
             break;
         }
@@ -32,10 +32,11 @@ class BottomNavBar extends StatelessWidget {
           icon: Icon(Icons.home),
           label: 'Ana Sayfa',
         ),
+        /*
         BottomNavigationBarItem(
           icon: Icon(Icons.bookmark_border),
           label: 'Kayıtlar',
-        ),
+        ),*/
         BottomNavigationBarItem(
           icon: Icon(Icons.notifications_outlined),
           label: 'Alarmlar',

@@ -57,7 +57,7 @@ class AppDrawer extends StatelessWidget {
                   Navigator.pushNamed(context, '/home');
                 }
               },
-            ),
+            ),/*
             _buildDrawerItem(
               icon: Icons.bar_chart,
               title: 'İstatistikler',
@@ -69,8 +69,8 @@ class AppDrawer extends StatelessWidget {
                 
                 
               },
-            ),
-            _buildDrawerItem(
+            ),*/
+            /*_buildDrawerItem(
               icon: Icons.bookmark_rounded,
               title: 'Kayıtlar',
               isSelected: currentRoute == '/datas',
@@ -79,7 +79,7 @@ class AppDrawer extends StatelessWidget {
                 Navigator.pop(context);
                 Navigator.pushNamed(context, '/datas');
               },
-            ),
+            ),*/
             _buildDrawerItem(
               icon: Icons.notifications_rounded,
               title: 'Alarmlar',
@@ -90,7 +90,26 @@ class AppDrawer extends StatelessWidget {
                 Navigator.pushNamed(context, '/alarms');
               },
             ),
+            _buildDrawerItem(
+              icon: Icons.calendar_today,
+              title: 'Dönemler',
+              isSelected: currentRoute == '/alarms',
+              onTap: () {
 
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/alarms');
+              },
+            ),
+            _buildDrawerItem(
+              icon: Icons.summarize,
+              title: 'Raporlar',
+              isSelected: currentRoute == '/alarms',
+              onTap: () {
+
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/alarms');
+              },
+            ),
             const SizedBox(height: 26),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 24),
@@ -123,7 +142,15 @@ class AppDrawer extends StatelessWidget {
                 Navigator.pushNamed(context, '/help');
               },
             ),
-            
+            _buildDrawerItem(
+              icon: Icons.science,
+              title: 'Test Ekranı',
+              isSelected: currentRoute == '/escape',
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/escape');
+              },
+            ),
             _buildDrawerItem(
               icon: Icons.logout_rounded,
               title: 'Çıkış Yap',

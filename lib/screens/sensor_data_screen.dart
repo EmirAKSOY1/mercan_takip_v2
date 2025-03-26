@@ -194,7 +194,6 @@ class _SensorDataScreen2State extends State<SensorDataScreen2> {
               'dis_sicaklik': data['dis_sicaklik']?.toString() ?? '0',
               'nem': data['nem']?.toString() ?? '0',
               'co2': data['co2']?.toString() ?? '0',
-              'amonyak': data['amonyak']?.toString() ?? '0',
               'olum_sayisi': data['olum_sayisi']?.toString() ?? '0',
               'olum_orani': data['olum_orani']?.toString() ?? '0',
               'su_tuketimi': data['su_tuketimi']?.toString() ?? '0',
@@ -335,25 +334,140 @@ class _SensorDataScreen2State extends State<SensorDataScreen2> {
                           Positioned(
                             top: MediaQuery.of(context).size.height * 0.08,
                             left: MediaQuery.of(context).size.width * 0.1,
-                            child: _buildSensorIndicator('${_sensorData!['ic_sicaklik']}°C', 'İç Isı'),
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  '/sensor_detail',
+                                  arguments: {
+                                    'title': 'İç Sıcaklık Detayı',
+                                    'value': '${_sensorData!['ic_sicaklik']}°C',
+                                    'coopId': widget.coopId,
+                                    'coopName': widget.coopName,
+                                    'sensorType': 'ic_sicaklik',
+                                    'sensorId': 1,
+                                  },
+                                );
+                              },
+                              child: _buildSensorIndicator('${_sensorData!['ic_sicaklik']}°C', 'İç Isı'),
+                            ),
                           ),
                           // CO2
                           Positioned(
                             top: MediaQuery.of(context).size.height * 0.02,
                             right: MediaQuery.of(context).size.width * 0.05,
-                            child: _buildSensorIndicator('${_sensorData!['co2']} ppm', 'CO2'),
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  '/sensor_detail',
+                                  arguments: {
+                                    'title': 'CO2 Detayı',
+                                    'value': '${_sensorData!['co2']} ppm',
+                                    'coopId': widget.coopId,
+                                    'coopName': widget.coopName,
+                                    'sensorType': 'co2',
+                                    'sensorId': 2,
+                                  },
+                                );
+                              },
+                              child: Container(
+                                width: 100,
+                                height: 100,
+                                padding: EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white,
+                                  border: Border.all(color: Colors.grey[300]!, width: 1.5),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 4,
+                                      offset: Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${_sensorData!['co2']}',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          ' ppm',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 4),
+                                    Text(
+                                      'CO2',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey[700],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                           ),
                           // Dış Isı
                           Positioned(
                             bottom: MediaQuery.of(context).size.height * 0.15,
                             left: MediaQuery.of(context).size.width * 0.1,
-                            child: _buildSensorIndicator('${_sensorData!['dis_sicaklik']}°C', 'Dış Isı'),
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  '/sensor_detail',
+                                  arguments: {
+                                    'title': 'Dış Sıcaklık Detayı',
+                                    'value': '${_sensorData!['dis_sicaklik']}°C',
+                                    'coopId': widget.coopId,
+                                    'coopName': widget.coopName,
+                                    'sensorType': 'dis_sicaklik',
+                                    'sensorId': 3,
+
+                                  },
+                                );
+                              },
+                              child: _buildSensorIndicator('${_sensorData!['dis_sicaklik']}°C', 'Dış Isı'),
+                            ),
                           ),
                           // Nem
                           Positioned(
                             bottom: MediaQuery.of(context).size.height * 0.15,
                             right: MediaQuery.of(context).size.width * 0.1,
-                            child: _buildSensorIndicator('%${_sensorData!['nem']}', 'Nem'),
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  '/sensor_detail',
+                                  arguments: {
+                                    'title': 'Nem Detayı',
+                                    'value': '%${_sensorData!['nem']}',
+                                    'coopId': widget.coopId,
+                                    'coopName': widget.coopName,
+                                    'sensorType': 'nem',
+                                    'sensorId': 4,
+                                  },
+                                );
+                              },
+                              child: _buildSensorIndicator('%${_sensorData!['nem']}', 'Nem'),
+                            ),
                           ),
                         ],
                       ),
@@ -398,25 +512,39 @@ class _SensorDataScreen2State extends State<SensorDataScreen2> {
 
   Widget _buildSensorIndicator(String value, String label) {
     return Container(
+      width: 100,
+      height: 100,
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: Colors.white,
-        border: Border.all(color: Colors.grey[300]!, width: 1),
+        border: Border.all(color: Colors.grey[300]!, width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 4,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             value,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
+          SizedBox(height: 4),
           Text(
             label,
-            style: TextStyle(fontSize: 14),
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[700],
+            ),
           ),
         ],
       ),

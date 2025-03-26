@@ -5,12 +5,14 @@ import 'screens/auth/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/help_screen.dart';
 import 'screens/settings_screen.dart';
-import 'screens/datas_screen.dart';
+//import 'screens/datas_screen.dart';
 import 'screens/alarms_screen.dart';
-import 'screens/statistics_screen.dart';
+//import 'screens/statistics_screen.dart';
 import 'screens/about_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'screens/sensor_detail_screen.dart';
+import 'screens/escape_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,10 +44,22 @@ class MyApp extends StatelessWidget {
         '/home': (context) => const HomeScreen(),
         '/help': (context) => const HelpScreen(),
         '/settings': (context) => const SettingsScreen(),
-        '/datas': (context) => const DatasScreen(),
+        //'/datas': (context) => const DatasScreen(),
         '/alarms': (context) => const AlarmsScreen(),
-        '/statistics': (context) => const StatisticsScreen(),
+        //'/statistics': (context) => const StatisticsScreen(),
         '/about': (context) => const AboutScreen(),
+        '/sensor_detail': (context) {
+          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+          return SensorDetailScreen(
+            title: args['title'],
+            value: args['value'],
+            coopId: args['coopId'],
+            coopName: args['coopName'],
+            sensorType: args['sensorType'],
+            sensorId: args['sensorType'],
+          );
+        },
+        '/escape': (context) => const EscapeScreen(),
       },
     );
   }

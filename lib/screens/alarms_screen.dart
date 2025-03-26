@@ -482,7 +482,7 @@ class _AlarmsScreenState extends State<AlarmsScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: const BottomNavBar(currentIndex: 2),
+      bottomNavigationBar: const BottomNavBar(currentIndex: 1),
     );
   }
 
