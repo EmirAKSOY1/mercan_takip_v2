@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:mercan_takip_v2/services/auth_service.dart';
 import 'dart:math';
 import 'package:intl/intl.dart';
+
+class ChartData {
+  final DateTime time;
+  final double value;
+
+  ChartData(this.time, this.value);
+}
 
 class SensorDetailScreen extends StatefulWidget {
   final String title;
@@ -30,20 +37,24 @@ class SensorDetailScreen extends StatefulWidget {
 
 class _SensorDetailScreenState extends State<SensorDetailScreen> {
   bool _isLoading = true;
-  List<FlSpot> _chartData = [];
+  List<ChartData> _chartData = [];
   final AuthService _authService = AuthService();
-  double _minX = 0;
-  double _maxX = 0;
-  double _minY = 0;
-  double _maxY = 0;
-  double _currentScale = 1.0;
-  double _baseScaleFactor = 1.0;
-  double _viewportLeft = 0;
-  double _viewportRight = 0;
+  late ZoomPanBehavior _zoomPanBehavior;
 
   @override
   void initState() {
     super.initState();
+    _zoomPanBehavior = ZoomPanBehavior(
+      enablePinching: true,
+      enableDoubleTapZooming: true,
+      enablePanning: true,
+      enableMouseWheelZooming: true,
+      enableSelectionZooming: true,
+      selectionRectColor: Colors.blue.withOpacity(0.1),
+      selectionRectBorderColor: Colors.blue,
+      selectionRectBorderWidth: 2,
+      zoomMode: ZoomMode.x,
+    );
     _loadHistoricalData();
   }
 
@@ -75,39 +86,59 @@ class _SensorDetailScreenState extends State<SensorDetailScreen> {
         if (responseData['status'] == 'success' && mounted) {
           final data = responseData['data'];
           
+          print('API yanıtı: ${responseData.toString().substring(0, min(200, responseData.toString().length))}...');
+          print('API veri uzunluğu: ${data?.length ?? 0}');
+          
           if (data != null && data.isNotEmpty) {
-            final List<FlSpot> chartData = [];
-            final now = DateTime.now();
+            final List<ChartData> chartData = [];
             
-            for (int i = 0; i < data.length; i++) {
-              final value = data[i][_getSensorCode()];
-              if (value != null) {
+            // Örnek veriyi kontrol et
+            if (data.length > 0) {
+              print('İlk veri örneği: ${data[0].toString()}');
+              print('Sensör kodu: ${_getSensorCode()}');
+            }
+            
+            for (var item in data) {
+              final value = item[_getSensorCode()];
+              final createdAt = item["tarih"];
+              
+              print('İşleniyor - value: $value, createdAt: $createdAt');
+              
+              if (value != null && createdAt != null) {
                 try {
                   final doubleValue = double.parse(value.toString());
+                  final time = DateTime.parse(createdAt);
+                  
+                  print('Ekleniyor - zaman: $time, değer: $doubleValue');
+                  
                   if (!doubleValue.isNaN && !doubleValue.isInfinite) {
-                    chartData.add(FlSpot(i.toDouble(), doubleValue));
+                    chartData.add(ChartData(time, doubleValue));
                   }
                 } catch (e) {
-                  print('Veri dönüştürme hatası: $e');
+                  print('Veri dönüştürme hatası: $e - value: $value, createdAt: $createdAt');
                 }
               }
+            }
+
+            // Tarihe göre sırala
+            chartData.sort((a, b) => a.time.compareTo(b.time));
+            print('Toplam işlenen veri: ${chartData.length}');
+            
+            if (chartData.isNotEmpty) {
+              print('İlk veri: ${chartData.first.time} - ${chartData.first.value}');
+              print('Son veri: ${chartData.last.time} - ${chartData.last.value}');
             }
 
             if (mounted && chartData.isNotEmpty) {
               setState(() {
                 _chartData = chartData;
-                _minX = 0;
-                _maxX = (chartData.length - 1).toDouble();
-                _minY = chartData.map((spot) => spot.y).reduce(min);
-                _maxY = chartData.map((spot) => spot.y).reduce(max);
-                _viewportLeft = _maxX - 12;
-                _viewportRight = _maxX;
                 _isLoading = false;
               });
             } else {
               setState(() {
                 _isLoading = false;
               });
+              print('Veri boş veya bileşen artık monte değil');
             }
           } else {
             setState(() {
@@ -150,40 +181,6 @@ class _SensorDetailScreenState extends State<SensorDetailScreen> {
         );
       }
     }
-  }
-
-  String _getTimeLabel(double value) {
-    if (value < 0 || value >= _chartData.length) return '';
-    final now = DateTime.now();
-    final time = now.subtract(Duration(minutes: (_chartData.length - value.round() - 1) * 10));
-    
-    if (time.minute == 0) {
-      return DateFormat('HH:00').format(time);
-    }
-    return '';
-  }
-
-  void _onScaleStart(ScaleStartDetails details) {
-    _baseScaleFactor = _currentScale;
-  }
-
-  void _onScaleUpdate(ScaleUpdateDetails details) {
-    setState(() {
-      _currentScale = (_baseScaleFactor * details.scale).clamp(1.0, 4.0);
-      
-      double viewportWidth;
-      if (_currentScale <= 1.5) {
-        viewportWidth = 12.0;
-      } else if (_currentScale <= 2.5) {
-        viewportWidth = 6.0;
-      } else {
-        viewportWidth = 3.0;
-      }
-      
-      double center = (_viewportLeft + _viewportRight) / 2;
-      _viewportLeft = (center - viewportWidth / 2).clamp(0.0, _maxX - viewportWidth);
-      _viewportRight = _viewportLeft + viewportWidth;
-    });
   }
 
   @override
@@ -244,7 +241,7 @@ class _SensorDetailScreenState extends State<SensorDetailScreen> {
                               ),
                               SizedBox(height: 8),
                               Text(
-                                '${widget.value} ${_getUnit()}',
+                                '${widget.value}',
                                 style: TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
@@ -299,143 +296,116 @@ class _SensorDetailScreenState extends State<SensorDetailScreen> {
                               ),
                             ),
                             Expanded(
-                              child: GestureDetector(
-                                onScaleStart: _onScaleStart,
-                                onScaleUpdate: _onScaleUpdate,
-                                child: LineChart(
-                                  LineChartData(
-                                    minX: _viewportLeft,
-                                    maxX: _viewportRight,
-                                    minY: _minY - (_maxY - _minY) * 0.1,
-                                    maxY: _maxY + (_maxY - _minY) * 0.1,
-                                    clipData: FlClipData.all(),
-                                    gridData: FlGridData(
-                                      show: true,
-                                      drawVerticalLine: true,
-                                      getDrawingHorizontalLine: (value) => FlLine(
-                                        color: Colors.grey.withOpacity(0.1),
-                                        strokeWidth: 0.5,
-                                        dashArray: [5, 5],
-                                      ),
-                                      getDrawingVerticalLine: (value) => FlLine(
-                                        color: Colors.grey.withOpacity(0.1),
-                                        strokeWidth: 0.5,
-                                        dashArray: [5, 5],
-                                      ),
-                                      horizontalInterval: (_maxY - _minY) / 5,
-                                      verticalInterval: 6,
+                              child: SfCartesianChart(
+                                primaryXAxis: DateTimeAxis(
+                                  dateFormat: DateFormat('HH:mm'),
+                                  intervalType: DateTimeIntervalType.minutes,
+                                  interval: 60,
+                                  minimum: _chartData.isNotEmpty ? _chartData.first.time : DateTime.now().subtract(Duration(hours: 24)),
+                                  maximum: _chartData.isNotEmpty ? _chartData.last.time : DateTime.now(),
+                                  labelRotation: -45,
+                                  labelStyle: TextStyle(
+                                    color: Colors.black54,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  enableAutoIntervalOnZooming: true,
+                                ),
+                                primaryYAxis: NumericAxis(
+                                  labelStyle: TextStyle(
+                                    color: Colors.black54,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                zoomPanBehavior: _zoomPanBehavior,
+                                crosshairBehavior: CrosshairBehavior(
+                                  enable: false,
+                                ),
+                                series: <CartesianSeries>[
+                                  LineSeries<ChartData, DateTime>(
+                                    dataSource: _chartData,
+                                    xValueMapper: (ChartData data, _) => data.time,
+                                    yValueMapper: (ChartData data, _) => data.value,
+                                    color: _getChartColor(),
+                                    width: 3,
+                                    markerSettings: MarkerSettings(
+                                      isVisible: false,
                                     ),
-                                    titlesData: FlTitlesData(
-                                      show: true,
-                                      topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                      rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                      bottomTitles: AxisTitles(
-                                        sideTitles: SideTitles(
-                                          showTitles: true,
-                                          reservedSize: 32,
-                                          getTitlesWidget: (value, meta) {
-                                            final label = _getTimeLabel(value);
-                                            return label.isEmpty ? Container() : Transform.rotate(
-                                              angle: -0.5,
-                                              child: Text(
-                                                label,
+                                  ),
+                                ],
+                                tooltipBehavior: TooltipBehavior(
+                                  enable: true,
+                                  activationMode: ActivationMode.singleTap,
+                                  tooltipPosition: TooltipPosition.pointer,
+                                  duration: 0,
+                                  color: Colors.blueGrey.shade800.withOpacity(0.9),
+                                  borderWidth: 2,
+                                  borderColor: _getChartColor(),
+                                  textStyle: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  shouldAlwaysShow: true,
+                                  builder: (dynamic data, dynamic point, dynamic series, int pointIndex, int seriesIndex) {
+                                    return Container(
+                                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blueGrey.shade800.withOpacity(0.9),
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(
+                                          color: _getChartColor(),
+                                          width: 1,
+                                        ),
+                                      ),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                Icons.access_time,
+                                                size: 14,
+                                                color: Colors.white70,
+                                              ),
+                                              SizedBox(width: 4),
+                                              Text(
+                                                DateFormat('HH:mm').format(data.time),
                                                 style: TextStyle(
-                                                  color: Colors.black54,
-                                                  fontSize: 11,
+                                                  color: Colors.white70,
+                                                  fontSize: 12,
                                                   fontWeight: FontWeight.w500,
                                                 ),
                                               ),
-                                            );
-                                          },
-                                          interval: 6,
-                                        ),
-                                      ),
-                                      leftTitles: AxisTitles(
-                                        sideTitles: SideTitles(
-                                          showTitles: true,
-                                          reservedSize: 40,
-                                          getTitlesWidget: (value, meta) => Text(
-                                            value.toStringAsFixed(1),
-                                            style: TextStyle(
-                                              color: Colors.black54,
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                          interval: (_maxY - _minY) / 5,
-                                        ),
-                                      ),
-                                    ),
-                                    borderData: FlBorderData(
-                                      show: true,
-                                      border: Border(
-                                        bottom: BorderSide(color: Colors.grey.withOpacity(0.2), width: 1),
-                                        left: BorderSide(color: Colors.grey.withOpacity(0.2), width: 1),
-                                      ),
-                                    ),
-                                    lineBarsData: [
-                                      LineChartBarData(
-                                        spots: _chartData,
-                                        isCurved: true,
-                                        color: _getChartColor(),
-                                        barWidth: 2.5,
-                                        isStrokeCapRound: true,
-                                        dotData: FlDotData(
-                                          show: _currentScale > 2.0,
-                                          getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
-                                            radius: 3,
-                                            color: Colors.white,
-                                            strokeWidth: 2,
-                                            strokeColor: _getChartColor(),
-                                          ),
-                                        ),
-                                        belowBarData: BarAreaData(
-                                          show: true,
-                                          gradient: LinearGradient(
-                                            begin: Alignment.topCenter,
-                                            end: Alignment.bottomCenter,
-                                            colors: [
-                                              _getChartColor().withOpacity(0.3),
-                                              _getChartColor().withOpacity(0.05),
                                             ],
                                           ),
-                                        ),
-                                      ),
-                                    ],
-                                    lineTouchData: LineTouchData(
-                                      enabled: true,
-                                      touchTooltipData: LineTouchTooltipData(
-                                        tooltipBgColor: Colors.blueGrey.shade800.withOpacity(0.9),
-                                        tooltipRoundedRadius: 8,
-                                        tooltipPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                        getTooltipItems: (touchedSpots) {
-                                          return touchedSpots.map((LineBarSpot touchedSpot) {
-                                            final time = DateTime.now().subtract(
-                                              Duration(minutes: (_chartData.length - touchedSpot.x.round() - 1) * 10),
-                                            );
-                                            return LineTooltipItem(
-                                              DateFormat('HH:mm').format(time),
-                                              const TextStyle(
-                                                color: Colors.white70,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w500,
+                                          SizedBox(height: 4),
+                                          Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                _getSensorIcon(),
+                                                size: 14,
+                                                color: Colors.white,
                                               ),
-                                              children: [
-                                                TextSpan(
-                                                  text: '\n${touchedSpot.y.toStringAsFixed(1)} ${_getUnit()}',
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
+                                              SizedBox(width: 4),
+                                              Text(
+                                                '${data.value.toStringAsFixed(1)} ${_getUnit()}',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
                                                 ),
-                                              ],
-                                            );
-                                          }).toList();
-                                        },
+                                              ),
+                                            ],
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                  ),
+                                    );
+                                  },
                                 ),
                               ),
                             ),

@@ -93,21 +93,21 @@ class AppDrawer extends StatelessWidget {
             _buildDrawerItem(
               icon: Icons.calendar_today,
               title: 'Dönemler',
-              isSelected: currentRoute == '/alarms',
+              isSelected: currentRoute == '/periods',
               onTap: () {
 
                 Navigator.pop(context);
-                Navigator.pushNamed(context, '/alarms');
+                Navigator.pushNamed(context, '/periods');
               },
             ),
             _buildDrawerItem(
               icon: Icons.summarize,
               title: 'Raporlar',
-              isSelected: currentRoute == '/alarms',
+              isSelected: currentRoute == '/reports',
               onTap: () {
 
                 Navigator.pop(context);
-                Navigator.pushNamed(context, '/alarms');
+                Navigator.pushNamed(context, '/reports');
               },
             ),
             const SizedBox(height: 26),
