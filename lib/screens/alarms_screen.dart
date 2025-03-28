@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:mercan_takip_v2/widgets/app_drawer.dart';
 import 'package:mercan_takip_v2/widgets/bottom_nav_bar.dart';
 import 'package:mercan_takip_v2/services/auth_service.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AlarmsScreen extends StatefulWidget {
   const AlarmsScreen({super.key});
@@ -50,7 +51,7 @@ class _AlarmsScreenState extends State<AlarmsScreen> {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         setState(() {
-          _coops = [{'id': '0', 'name': 'Tümü'}, ...data];
+          _coops = [{'id': '0', 'name': AppLocalizations.of(context)!.all}, ...data];
         });
       }
     } catch (e) {
@@ -146,6 +147,7 @@ class _AlarmsScreenState extends State<AlarmsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       drawer: const AppDrawer(currentRoute: '/alarms'),
       appBar: AppBar(
@@ -157,7 +159,7 @@ class _AlarmsScreenState extends State<AlarmsScreen> {
             },
           ),
         ),
-        title: const Text('Alarmlar'),
+        title: Text(l10n.alarms),
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -169,7 +171,6 @@ class _AlarmsScreenState extends State<AlarmsScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            // Üst Banner
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(24),
@@ -187,17 +188,17 @@ class _AlarmsScreenState extends State<AlarmsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Alarmlar',
+                  Text(
+                    l10n.alarms,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   Text(
-                    'Toplam $_totalItems alarm',
+                    l10n.totalAlarms(_totalItems),
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.8),
                       fontSize: 16,
@@ -208,11 +209,10 @@ class _AlarmsScreenState extends State<AlarmsScreen> {
             ),
             const SizedBox(height: 24),
 
-            // Filtreler
             Card(
               child: ExpansionTile(
                 leading: const Icon(Icons.filter_list),
-                title: const Text('Filtrele'),
+                title: Text(l10n.filter),
                 trailing: const Icon(Icons.arrow_drop_down),
                 children: [
                   Padding(
@@ -220,8 +220,8 @@ class _AlarmsScreenState extends State<AlarmsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Kümes Seçin',
+                        Text(
+                          l10n.selectCoop,
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
@@ -256,8 +256,8 @@ class _AlarmsScreenState extends State<AlarmsScreen> {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        const Text(
-                          'Tarih Aralığı',
+                        Text(
+                          l10n.dateRange,
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
@@ -279,7 +279,7 @@ class _AlarmsScreenState extends State<AlarmsScreen> {
                                   child: Text(
                                     _startDate != null
                                         ? _formatDateOnly(_startDate!.toIso8601String())
-                                        : 'Başlangıç Tarihi',
+                                        : l10n.startDate,
                                     style: TextStyle(
                                       color: _startDate != null ? Colors.black : Colors.grey[600],
                                     ),
@@ -301,7 +301,7 @@ class _AlarmsScreenState extends State<AlarmsScreen> {
                                   child: Text(
                                     _endDate != null
                                         ? _formatDateOnly(_endDate!.toIso8601String())
-                                        : 'Bitiş Tarihi',
+                                        : l10n.endDate,
                                     style: TextStyle(
                                       color: _endDate != null ? Colors.black : Colors.grey[600],
                                     ),
@@ -325,7 +325,7 @@ class _AlarmsScreenState extends State<AlarmsScreen> {
                                 _fetchAlarms();
                               },
                               icon: const Icon(Icons.clear),
-                              label: const Text('Filtreyi Temizle'),
+                              label: Text(l10n.clearFilter),
                             ),
                           ),
                         ],
@@ -337,7 +337,6 @@ class _AlarmsScreenState extends State<AlarmsScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Alarm Listesi
             if (_isLoading)
               const Center(child: CircularProgressIndicator())
             else
@@ -355,15 +354,15 @@ class _AlarmsScreenState extends State<AlarmsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            alarm['description'] ?? 'Alarm açıklaması yok',
-                            style: const TextStyle(
+                            alarm['description'] ?? l10n.noAlarmDescription,
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            alarm['coop_name'] ?? 'Bilinmeyen Kümes',
+                            alarm['coop_name'] ?? l10n.unknownCoop,
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.grey[600],
@@ -385,7 +384,6 @@ class _AlarmsScreenState extends State<AlarmsScreen> {
               ),
             const SizedBox(height: 24),
 
-            // Sayfalama Kontrolleri
             if (_totalItems > _itemsPerPage)
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 16),
@@ -410,7 +408,7 @@ class _AlarmsScreenState extends State<AlarmsScreen> {
                                   _fetchAlarms();
                                 }
                               : null,
-                          tooltip: 'İlk Sayfa',
+                          tooltip: l10n.firstPage,
                         ),
                         const SizedBox(width: 8),
                         _buildPageButton(
@@ -425,7 +423,7 @@ class _AlarmsScreenState extends State<AlarmsScreen> {
                                   _fetchAlarms();
                                 }
                               : null,
-                          tooltip: 'Önceki Sayfa',
+                          tooltip: l10n.previousPage,
                         ),
                         const SizedBox(width: 16),
                         Container(
@@ -436,7 +434,7 @@ class _AlarmsScreenState extends State<AlarmsScreen> {
                             border: Border.all(color: Colors.red[100]!),
                           ),
                           child: Text(
-                            'Sayfa ${_currentPage + 1}/${(_totalItems / _itemsPerPage).ceil()}',
+                            l10n.page(_currentPage + 1, (_totalItems / _itemsPerPage).ceil()),
                             style: TextStyle(
                               fontSize: fontSize,
                               fontWeight: FontWeight.w600,
@@ -457,7 +455,7 @@ class _AlarmsScreenState extends State<AlarmsScreen> {
                                   _fetchAlarms();
                                 }
                               : null,
-                          tooltip: 'Sonraki Sayfa',
+                          tooltip: l10n.nextPage,
                         ),
                         const SizedBox(width: 8),
                         _buildPageButton(
@@ -472,7 +470,7 @@ class _AlarmsScreenState extends State<AlarmsScreen> {
                                   _fetchAlarms();
                                 }
                               : null,
-                          tooltip: 'Son Sayfa',
+                          tooltip: l10n.lastPage,
                         ),
                       ],
                     );

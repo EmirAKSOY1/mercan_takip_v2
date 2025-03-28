@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class AppDrawer extends StatelessWidget {
   final String currentRoute;
 
@@ -10,6 +10,7 @@ class AppDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Drawer(
       child: Container(
         color: Colors.white,
@@ -49,7 +50,7 @@ class AppDrawer extends StatelessWidget {
             ),
             _buildDrawerItem(
               icon: Icons.dashboard_rounded,
-              title: 'Anasayfa',
+              title: l10n.dashboard,
               isSelected: currentRoute == '/home',
               onTap: () {
                 if (currentRoute != '/home') {
@@ -82,7 +83,7 @@ class AppDrawer extends StatelessWidget {
             ),*/
             _buildDrawerItem(
               icon: Icons.notifications_rounded,
-              title: 'Alarmlar',
+              title: l10n.alarms,
               isSelected: currentRoute == '/alarms',
               onTap: () {
 
@@ -92,7 +93,7 @@ class AppDrawer extends StatelessWidget {
             ),
             _buildDrawerItem(
               icon: Icons.calendar_today,
-              title: 'Dönemler',
+              title: l10n.terms,
               isSelected: currentRoute == '/periods',
               onTap: () {
 
@@ -102,7 +103,7 @@ class AppDrawer extends StatelessWidget {
             ),
             _buildDrawerItem(
               icon: Icons.summarize,
-              title: 'Raporlar',
+              title: l10n.reports,
               isSelected: currentRoute == '/reports',
               onTap: () {
 
@@ -111,10 +112,10 @@ class AppDrawer extends StatelessWidget {
               },
             ),
             const SizedBox(height: 26),
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(horizontal: 24),
               child: Text(
-                'Diğer',
+                l10n.other,
                 style: TextStyle(
                   color: Colors.grey,
                   fontSize: 13,
@@ -126,7 +127,7 @@ class AppDrawer extends StatelessWidget {
 
             _buildDrawerItem(
               icon: Icons.settings_rounded,
-              title: 'Ayarlar',
+              title: l10n.settings,
               isSelected: currentRoute == '/settings',
               onTap: () {
                 Navigator.pop(context);
@@ -135,7 +136,7 @@ class AppDrawer extends StatelessWidget {
             ),
             _buildDrawerItem(
               icon: Icons.help_outline_rounded,
-              title: 'Yardım',
+              title: l10n.help,
               isSelected: currentRoute == '/help',
               onTap: () {
                 Navigator.pop(context);
@@ -153,7 +154,7 @@ class AppDrawer extends StatelessWidget {
             ),
             _buildDrawerItem(
               icon: Icons.logout_rounded,
-              title: 'Çıkış Yap',
+              title: l10n.logout,
               isSelected: false,
               onTap: () {
                 Navigator.pop(context);

@@ -1,0 +1,38 @@
+{
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "theme": "Theme",
+    "dark_mode": "Dark Mode",
+    "light_mode": "Light Mode",
+    "banner_title": "Settings",
+    "banner_subtitle": "Manage your application settings here",
+    "profile_settings": "Profile Settings",
+    "profile_info": "Profile Information",
+    "profile_info_subtitle": "Update your name, surname and contact information",
+    "change_password": "Change Password",
+    "change_password_subtitle": "Update your account password",
+    "app_settings": "Application Settings",
+    "notification_settings": "Notification Settings",
+    "notification_settings_subtitle": "Manage your notification preferences",
+    "language_settings": "Language",
+    "language_settings_subtitle": "Change application language",
+    "other": "Other",
+    "about": "About",
+    "about_subtitle": "Application version and license information",
+    "delete_account": "Delete Account",
+    "delete_account_subtitle": "Permanently delete your account"
+  },
+  "home": {
+    "title": "Home"
+  },
+  "profile": {
+    "title": "Profile"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit"
+  }
+} 

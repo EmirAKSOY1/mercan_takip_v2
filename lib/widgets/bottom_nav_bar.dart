@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class BottomNavBar extends StatelessWidget {
   final int currentIndex;
 
@@ -10,6 +10,7 @@ class BottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BottomNavigationBar(
       currentIndex: currentIndex >= 0 ? currentIndex : 0,
       selectedItemColor: currentIndex >= 0 ? Colors.blue : Colors.grey,
@@ -27,10 +28,10 @@ class BottomNavBar extends StatelessWidget {
             break;
         }
       },
-      items: const [
+      items:  [
         BottomNavigationBarItem(
           icon: Icon(Icons.home),
-          label: 'Ana Sayfa',
+          label: l10n.dashboard,
         ),
         /*
         BottomNavigationBarItem(
@@ -39,7 +40,7 @@ class BottomNavBar extends StatelessWidget {
         ),*/
         BottomNavigationBarItem(
           icon: Icon(Icons.notifications_outlined),
-          label: 'Alarmlar',
+          label: l10n.alarms,
         ),
       ],
     );

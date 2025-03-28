@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'screens/splash_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/auth/login_screen.dart';
@@ -14,19 +15,42 @@ import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'screens/sensor_detail_screen.dart';
 import 'screens/escape_screen.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initializeDateFormatting('tr_TR', null);
-  Intl.defaultLocale = 'tr_TR';
+  
+  final prefs = await SharedPreferences.getInstance();
+  final savedLocale = prefs.getString('locale') ?? 'tr_TR';
+  
+  await initializeDateFormatting(savedLocale, null);
+  Intl.defaultLocale = savedLocale;
+  
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  String _currentLocale = 'tr_TR';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedLocale();
+  }
+
+  Future<void> _loadSavedLocale() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _currentLocale = prefs.getString('locale') ?? 'tr_TR';
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,14 +65,16 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       localizationsDelegates: [
+        AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: [
         const Locale('tr', 'TR'),
+        const Locale('en', 'US'),
       ],
-      locale: const Locale('tr', 'TR'),
+      locale: Locale(_currentLocale.split('_')[0], _currentLocale.split('_')[1]),
       initialRoute: '/',
       routes: {
         '/': (context) => const SplashScreen(),
@@ -56,7 +82,13 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/home': (context) => const HomeScreen(),
         '/help': (context) => const HelpScreen(),
-        '/settings': (context) => const SettingsScreen(),
+        '/settings': (context) => SettingsScreen(
+          onLocaleChanged: (locale) {
+            setState(() {
+              _currentLocale = locale;
+            });
+          },
+        ),
         //'/datas': (context) => const DatasScreen(),
         '/alarms': (context) => const AlarmsScreen(),
         //'/statistics': (context) => const StatisticsScreen(),

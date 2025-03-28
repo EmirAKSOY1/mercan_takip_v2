@@ -111,8 +111,9 @@ class _SensorDetailScreenState extends State<SensorDetailScreen> {
         return;
       }
 
+      final endDateWithOffset = _endDate?.add(Duration(days: 1));
       final response = await http.get(
-        Uri.parse('http://62.171.140.229/api/getHistoricalData?coopId=${widget.coopId}&sensorId=${_getSensorId()}&startDate=${_startDate?.toIso8601String()}&endDate=${_endDate?.toIso8601String()}'),
+        Uri.parse('http://62.171.140.229/api/getHistoricalData?coopId=${widget.coopId}&sensorId=${_getSensorId()}&startDate=${_startDate?.toIso8601String()}&endDate=${endDateWithOffset?.toIso8601String()}'),
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
@@ -239,8 +240,9 @@ class _SensorDetailScreenState extends State<SensorDetailScreen> {
         return;
       }
 
+      final endDateWithOffset = _endDate?.add(Duration(days: 1));
       final response = await http.get(
-        Uri.parse('http://62.171.140.229/api/getHourlyData?coopId=${widget.coopId}&dataId=${_getSensorId()}&startDate=${_startDate?.toIso8601String()}&endDate=${_endDate?.toIso8601String()}'),
+        Uri.parse('http://62.171.140.229/api/getHourlyData?coopId=${widget.coopId}&dataId=${_getSensorId()}&startDate=${_startDate?.toIso8601String()}&endDate=${endDateWithOffset?.toIso8601String()}'),
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
@@ -658,9 +660,9 @@ class _SensorDetailScreenState extends State<SensorDetailScreen> {
                             Expanded(
                               child: SfCartesianChart(
                                 primaryXAxis: DateTimeAxis(
-                                  dateFormat: DateFormat('HH:mm'),
-                                  intervalType: DateTimeIntervalType.minutes,
-                                  interval: widget.sensorType == 'su_tuketimi' || widget.sensorType == 'yem_tuketimi' ? 120 : 60,
+                                  dateFormat: _getDateFormat(),
+                                  intervalType: _getIntervalType(),
+                                  interval: _getInterval(),
                                   minimum: _chartData.isNotEmpty ? _chartData.first.time : DateTime.now().subtract(Duration(hours: 24)),
                                   maximum: _chartData.isNotEmpty ? _chartData.last.time : DateTime.now(),
                                   labelRotation: -45,
@@ -770,7 +772,7 @@ class _SensorDetailScreenState extends State<SensorDetailScreen> {
                                               ),
                                               SizedBox(width: 4),
                                               Text(
-                                                DateFormat('HH:mm').format(data.time),
+                                                _getDateFormat().format(data.time),
                                                 style: TextStyle(
                                                   color: Colors.white70,
                                                   fontSize: 12,
@@ -951,5 +953,45 @@ class _SensorDetailScreenState extends State<SensorDetailScreen> {
         ),
       ],
     );
+  }
+
+  // Yeni yardımcı fonksiyonlar ekleyelim
+  DateFormat _getDateFormat() {
+    if (_startDate == null || _endDate == null) return DateFormat('HH:mm');
+    
+    final difference = _endDate!.difference(_startDate!);
+    if (difference.inHours <= 24) {
+      return DateFormat('HH:mm');
+    } else if (difference.inDays <= 7) {
+      return DateFormat('dd/MM HH:mm');
+    } else {
+      return DateFormat('dd/MM/yyyy');
+    }
+  }
+
+  DateTimeIntervalType _getIntervalType() {
+    if (_startDate == null || _endDate == null) return DateTimeIntervalType.minutes;
+    
+    final difference = _endDate!.difference(_startDate!);
+    if (difference.inHours <= 24) {
+      return DateTimeIntervalType.minutes;
+    } else if (difference.inDays <= 7) {
+      return DateTimeIntervalType.hours;
+    } else {
+      return DateTimeIntervalType.days;
+    }
+  }
+
+  double _getInterval() {
+    if (_startDate == null || _endDate == null) return 60;
+    
+    final difference = _endDate!.difference(_startDate!);
+    if (difference.inHours <= 24) {
+      return 60; // Her saat için bir gösterge
+    } else if (difference.inDays <= 7) {
+      return 4; // Her 4 saat için bir gösterge
+    } else {
+      return 1; // Her gün için bir gösterge
+    }
   }
 } 

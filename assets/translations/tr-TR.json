@@ -1,0 +1,38 @@
+{
+  "settings": {
+    "title": "Ayarlar",
+    "language": "Dil",
+    "theme": "Tema",
+    "dark_mode": "Karanlık Mod",
+    "light_mode": "Aydınlık Mod",
+    "banner_title": "Ayarlar",
+    "banner_subtitle": "Uygulama ayarlarınızı buradan yönetebilirsiniz",
+    "profile_settings": "Profil Ayarları",
+    "profile_info": "Profil Bilgileri",
+    "profile_info_subtitle": "Ad, soyad ve iletişim bilgilerinizi güncelleyin",
+    "change_password": "Şifre Değiştir",
+    "change_password_subtitle": "Hesap şifrenizi güncelleyin",
+    "app_settings": "Uygulama Ayarları",
+    "notification_settings": "Bildirim Ayarları",
+    "notification_settings_subtitle": "Bildirim tercihlerinizi yönetin",
+    "language_settings": "Dil",
+    "language_settings_subtitle": "Uygulama dilini değiştirin",
+    "other": "Diğer",
+    "about": "Hakkında",
+    "about_subtitle": "Uygulama versiyonu ve lisans bilgileri",
+    "delete_account": "Hesabı Sil",
+    "delete_account_subtitle": "Hesabınızı kalıcı olarak silin"
+  },
+  "home": {
+    "title": "Ana Sayfa"
+  },
+  "profile": {
+    "title": "Profil"
+  },
+  "common": {
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "delete": "Sil",
+    "edit": "Düzenle"
+  }
+} 

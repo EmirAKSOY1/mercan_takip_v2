@@ -7,6 +7,7 @@ import 'package:mercan_takip_v2/screens/sensor_data_screen.dart';
 import 'package:mercan_takip_v2/widgets/app_drawer.dart';
 import 'package:mercan_takip_v2/widgets/bottom_nav_bar.dart';
 import 'package:mercan_takip_v2/services/auth_service.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -29,13 +30,22 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Coop> _activeCoops = [];
   String _userName = '';
   final _authService = AuthService();
+  String _currentLocale = 'tr_TR';
 
   @override
   void initState() {
     super.initState();
+    _loadLocale();
     _fetchGeneralData();
     _fetchActiveCoops();
     _loadUserName();
+  }
+
+  Future<void> _loadLocale() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _currentLocale = prefs.getString('locale') ?? 'tr_TR';
+    });
   }
 
   Future<void> _loadUserName() async {
@@ -150,7 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   String _getCurrentDay() {
-    return DateFormat('EEEE', 'tr_TR').format(DateTime.now());
+    return DateFormat('EEEE', _currentLocale).format(DateTime.now());
   }
 
   Future<void> _handleLogout() async {
@@ -171,6 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final currentDay = _getCurrentDay();
     
     return Scaffold(
@@ -191,7 +202,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Row(
               children: [
                 Text(
-                  'Merhaba, $_userName',
+                  '${l10n.hello}, $_userName',
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -267,9 +278,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Günlük Özet',
-                        style: TextStyle(
+                      Text(
+                        l10n.dailySummary,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -284,13 +295,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       _buildSummaryItem(
                         icon: Icons.thermostat,
-                        label: 'Dış Sıcaklık',
+                        label: l10n.outsideTemperature,
                         value: '${_generalData['avgTemperature']}°C',
                       ),
 
                       _buildSummaryItem(
                         icon: Icons.warning,
-                        label: 'Bugün Alarm',
+                        label: l10n.todayAlarms,
                         value: _generalData['dailyAlarms'],
                       ),
                     ],
@@ -362,9 +373,9 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 24),
 
             // Aktif Kümesler Başlığı
-            const Text(
-              'Aktif Kümesler',
-              style: TextStyle(
+            Text(
+              l10n.activeCoops,
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -457,6 +468,7 @@ class _HomeScreenState extends State<HomeScreen> {
     required String coopName,
     required int day,
   }) {
+    final l10n = AppLocalizations.of(context)!;
     // Her bar 5 günü temsil eder (45/9=5)
     final int activeIndicators = (day / 5).ceil();
     final indicators = List.generate(
@@ -526,7 +538,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    '$day. Gün',
+                    '${day}. ${l10n.day}',
                     style: const TextStyle(
                       color: Colors.blue,
                       fontWeight: FontWeight.bold,
@@ -537,7 +549,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Seri No: $coopId',
+              '${l10n.serialNumber}: $coopId',
               style: TextStyle(
                 color: Colors.grey[600],
                 fontSize: 14,

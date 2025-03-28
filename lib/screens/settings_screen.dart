@@ -1,11 +1,53 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mercan_takip_v2/widgets/app_drawer.dart';
 
-class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key});
+class SettingsScreen extends StatefulWidget {
+  final Function(String) onLocaleChanged;
+  
+  const SettingsScreen({
+    super.key,
+    required this.onLocaleChanged,
+  });
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  String _currentLocale = 'tr_TR';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedLocale();
+  }
+
+  Future<void> _loadSavedLocale() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _currentLocale = prefs.getString('locale') ?? 'tr_TR';
+    });
+  }
+
+  Future<void> _changeLanguage(String locale) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('locale', locale);
+    setState(() {
+      _currentLocale = locale;
+    });
+    widget.onLocaleChanged(locale);
+    if (mounted) {
+      Navigator.pop(context);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return Scaffold(
       drawer: const AppDrawer(currentRoute: '/settings'),
       appBar: AppBar(
@@ -17,12 +59,11 @@ class SettingsScreen extends StatelessWidget {
             },
           ),
         ),
-        title: const Text('Ayarlar'),
+        title: Text(l10n.settings),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // Üst Banner
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(24),
@@ -40,9 +81,9 @@ class SettingsScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Ayarlar',
-                  style: TextStyle(
+                Text(
+                  l10n.settings,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
@@ -50,7 +91,7 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Uygulama ayarlarınızı buradan yönetebilirsiniz',
+                  l10n.settingsDescription,
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.8),
                     fontSize: 16,
@@ -61,46 +102,75 @@ class SettingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          // Profil Ayarları
-          _buildSectionTitle('Profil Ayarları'),
+          _buildSectionTitle(l10n.profileSettings),
           _buildSettingCard(
             icon: Icons.person_outline,
-            title: 'Profil Bilgileri',
-            subtitle: 'Ad, soyad ve iletişim bilgilerinizi güncelleyin',
+            title: l10n.profileInfo,
+            subtitle: l10n.profileInfoDescription,
             onTap: () {},
           ),
           const SizedBox(height: 12),
           _buildSettingCard(
             icon: Icons.lock_outline,
-            title: 'Şifre Değiştir',
-            subtitle: 'Hesap şifrenizi güncelleyin',
+            title: l10n.changePassword,
+            subtitle: l10n.changePasswordDescription,
             onTap: () {},
           ),
           const SizedBox(height: 24),
 
-          // Uygulama Ayarları
-          _buildSectionTitle('Uygulama Ayarları'),
+          _buildSectionTitle(l10n.appSettings),
           _buildSettingCard(
             icon: Icons.notifications_outlined,
-            title: 'Bildirim Ayarları',
-            subtitle: 'Bildirim tercihlerinizi yönetin',
+            title: l10n.notificationSettings,
+            subtitle: l10n.notificationSettingsDescription,
             onTap: () {},
           ),
           const SizedBox(height: 12),
           _buildSettingCard(
             icon: Icons.language,
-            title: 'Dil',
-            subtitle: 'Uygulama dilini değiştirin',
-            onTap: () {},
+            title: l10n.language,
+            subtitle: l10n.languageDescription,
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text(l10n.language),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ListTile(
+                        title: const Text('Türkçe'),
+                        onTap: () {
+                          _changeLanguage('tr_TR');
+                          Navigator.pop(context);
+                        },
+                        trailing: _currentLocale == 'tr_TR'
+                            ? const Icon(Icons.check, color: Colors.green)
+                            : null,
+                      ),
+                      ListTile(
+                        title: const Text('English'),
+                        onTap: () {
+                          _changeLanguage('en_US');
+                          Navigator.pop(context);
+                        },
+                        trailing: _currentLocale == 'en_US'
+                            ? const Icon(Icons.check, color: Colors.green)
+                            : null,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
           ),
           const SizedBox(height: 24),
 
-          // Diğer
-          _buildSectionTitle('Diğer'),
+          _buildSectionTitle(l10n.other),
           _buildSettingCard(
             icon: Icons.info_outline,
-            title: 'Hakkında',
-            subtitle: 'Uygulama versiyonu ve lisans bilgileri',
+            title: l10n.about,
+            subtitle: l10n.aboutDescription,
             onTap: () {
               Navigator.pushNamed(context, '/about');
             },
@@ -108,8 +178,8 @@ class SettingsScreen extends StatelessWidget {
           const SizedBox(height: 12),
           _buildSettingCard(
             icon: Icons.delete_outline,
-            title: 'Hesabı Sil',
-            subtitle: 'Hesabınızı kalıcı olarak silin',
+            title: l10n.deleteAccount,
+            subtitle: l10n.deleteAccountDescription,
             onTap: () {},
             isDestructive: true,
           ),
