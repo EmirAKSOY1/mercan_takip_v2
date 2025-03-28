@@ -34,30 +34,33 @@ class DashedLinePainter extends CustomPainter {
     double w = screenSize.width / 400.0;  // 400 referans genişlik
     double h = screenSize.height / 800.0; // 800 referans yükseklik
     
-    // İç Isı için yol - orijinal koordinatları ölçeklendiriyoruz
-    final path1 = Path();
-    path1.moveTo(70 * w, 120 * h);
-    path1.lineTo(70 * w, 160 * h);
-    path1.lineTo(180 * w, 160 * h);
-    path1.lineTo(180 * w, 190 * h);
-
-    // Dış Isı için yol
-    final path2 = Path();
-    path2.moveTo(70 * w, 250 * h);
-    path2.lineTo(70 * w, 300 * h);
-    path2.lineTo(150 * w, 300 * h);
-
-    // Nem için yol
-    final path3 = Path();
-    path3.moveTo(290 * w, 250 * h);
+    // ÖNEMLİ: Çizgi koordinatlarını istediğiniz gibi ayarlayın
     
-    path3.lineTo(290 * w, 290 * h);
-    path3.lineTo(180 * w, 290 * h);
+    // İç Isı için yol (kırmızı çizgi)
+    final path1 = Path();
+    path1.moveTo(100 * w, 120 * h);  // Başlangıç noktası - solda göstergenin altı
+    path1.lineTo(100 * w, 140 * h);  // Aşağı doğru
+    path1.lineTo(180 * w, 140 * h); // Sağa doğru  
+    path1.lineTo(180 * w, 160 * h); // Biraz daha aşağı - kümesin içine doğru
 
-    // CO2 için yol
+    // Dış Isı için yol (mavi çizgi)
+    final path2 = Path();
+    path2.moveTo(100 * w, 200 * h);  // Başlangıç noktası - sol alt gösterge
+    path2.lineTo(150 * w, 200 * h);  // Aşağı doğru
+    path2.lineTo(150 * w, 220 * h);  // Aşağı doğru
+     // Sağa doğru - kümesin içine
+
+    // Nem için yol (turuncu çizgi)
+    final path3 = Path();
+    path3.moveTo(300 * w, 200 * h); // Başlangıç noktası - sağ alt gösterge
+    path3.lineTo(300 * w, 220 * h); // Aşağı doğru
+    path3.lineTo(200 * w, 220 * h); // Aşağı doğru
+    
+
+    // CO2 için yol (kırmızı çizgi)
     final path4 = Path();
-    path4.moveTo(300 * w, 80 * h);
-    path4.lineTo(300 * w, 140 * h);
+    path4.moveTo(250 * w, 80 * h);  // Başlangıç noktası - sağ üst gösterge
+    path4.lineTo(250 * w, 140 * h); // Aşağı doğru - kümesin içine
 
     // Tüm yolları çiz
     _drawDashedPath(canvas, path1, redPaint, dashWidth, dashSpace);
@@ -306,10 +309,10 @@ class _SensorDataScreen2State extends State<SensorDataScreen2> {
                         ],
                       ),
                     ),
-                    
+                    SizedBox(height: 30),
                     // Kümes resmi ve sensör verileri
                     Container(
-                      height: MediaQuery.of(context).size.height * 0.5,
+                      height: MediaQuery.of(context).size.height * 0.42,
                       margin: EdgeInsets.symmetric(horizontal: 16),
                       child: Stack(
                         fit: StackFit.expand,
@@ -332,8 +335,8 @@ class _SensorDataScreen2State extends State<SensorDataScreen2> {
                           ),
                           // İç Isı
                           Positioned(
-                            top: MediaQuery.of(context).size.height * 0.08,
-                            left: MediaQuery.of(context).size.width * 0.1,
+                            top: MediaQuery.of(context).size.height * 0.05,
+                            left: MediaQuery.of(context).size.width * 0.13,
                             child: GestureDetector(
                               onTap: () {
                                 Navigator.pushNamed(
@@ -355,7 +358,7 @@ class _SensorDataScreen2State extends State<SensorDataScreen2> {
                           // CO2
                           Positioned(
                             top: MediaQuery.of(context).size.height * 0.02,
-                            right: MediaQuery.of(context).size.width * 0.05,
+                            right: MediaQuery.of(context).size.width * 0.17,
                             child: GestureDetector(
                               onTap: () {
                                 Navigator.pushNamed(
@@ -426,8 +429,8 @@ class _SensorDataScreen2State extends State<SensorDataScreen2> {
                           ),
                           // Dış Isı
                           Positioned(
-                            bottom: MediaQuery.of(context).size.height * 0.15,
-                            left: MediaQuery.of(context).size.width * 0.1,
+                            bottom: MediaQuery.of(context).size.height * 0.12,
+                            left: MediaQuery.of(context).size.width * 0,
                             child: GestureDetector(
                               onTap: () {
                                 Navigator.pushNamed(
@@ -449,8 +452,8 @@ class _SensorDataScreen2State extends State<SensorDataScreen2> {
                           ),
                           // Nem
                           Positioned(
-                            bottom: MediaQuery.of(context).size.height * 0.15,
-                            right: MediaQuery.of(context).size.width * 0.1,
+                            bottom: MediaQuery.of(context).size.height * 0.17,
+                            right: MediaQuery.of(context).size.width * 0.04,
                             child: GestureDetector(
                               onTap: () {
                                 Navigator.pushNamed(
@@ -473,31 +476,49 @@ class _SensorDataScreen2State extends State<SensorDataScreen2> {
                       ),
                     ),
 
-                    // Alt kısımdaki kartlar
+                    SizedBox(height: 25),
                     Container(
-                      padding: EdgeInsets.all(16),
+                      padding: EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 16),
                       child: Row(
                         children: [
                           Expanded(
-                            child: _buildInfoCard('Ölüm Sayısı', _sensorData!['olum_sayisi'], const Color.fromARGB(255, 196, 108, 108)!),
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  '/sensor_detail',
+                                  arguments: {
+                                    'title': 'Su Tüketimi Detayı',
+                                    'value': _sensorData!['su_tuketimi'],
+                                    'coopId': widget.coopId,
+                                    'coopName': widget.coopName,
+                                    'sensorType': 'su_tuketimi',
+                                    'sensorId': 5,
+                                  },
+                                );
+                              },
+                              child: _buildInfoCard('Su Tüketimi', _sensorData!['su_tuketimi'], const Color.fromARGB(255, 70, 91, 109)!),
+                            ),
                           ),
                           SizedBox(width: 8),
                           Expanded(
-                            child: _buildInfoCard('Ölüm Oranı', _sensorData!['olum_orani'], const Color.fromARGB(255, 99, 148, 110)!),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.only(left: 16, right: 16, bottom: 16),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: _buildInfoCard('Su Tüketimi', _sensorData!['su_tuketimi'], const Color.fromARGB(255, 70, 91, 109)!),
-                          ),
-                          SizedBox(width: 8),
-                          Expanded(
-                            child: _buildInfoCard('Yem Tüketimi', _sensorData!['yem_tuketimi'], const Color.fromARGB(255, 143, 111, 81)!),
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  '/sensor_detail',
+                                  arguments: {
+                                    'title': 'Yem Tüketimi Detayı',
+                                    'value': _sensorData!['yem_tuketimi'],
+                                    'coopId': widget.coopId,
+                                    'coopName': widget.coopName,
+                                    'sensorType': 'yem_tuketimi',
+                                    'sensorId': 6,
+                                  },
+                                );
+                              },
+                              child: _buildInfoCard('Yem Tüketimi', _sensorData!['yem_tuketimi'], const Color.fromARGB(255, 143, 111, 81)!),
+                            ),
                           ),
                         ],
                       ),
