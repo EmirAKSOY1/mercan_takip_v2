@@ -143,15 +143,7 @@ class AppDrawer extends StatelessWidget {
                 Navigator.pushNamed(context, '/help');
               },
             ),
-            _buildDrawerItem(
-              icon: Icons.science,
-              title: 'Test Ekranı',
-              isSelected: currentRoute == '/escape',
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/escape');
-              },
-            ),
+
             _buildDrawerItem(
               icon: Icons.logout_rounded,
               title: l10n.logout,

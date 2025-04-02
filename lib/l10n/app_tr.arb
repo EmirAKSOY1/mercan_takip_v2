@@ -28,6 +28,7 @@
     "filter": "Filtrele",
     "selectCoop": "Kümes Seçin",
     "dateRange": "Tarih Aralığı",
+    "selecteddateRange": "Seçilen Tarih Aralığı",
     "startDate": "Başlangıç Tarihi",
     "endDate": "Bitiş Tarihi",
     "clearFilter": "Filtreyi Temizle",
@@ -43,5 +44,23 @@
     "terms":"Dönemler",
     "reports":"Raporlar",
     "help":"Yardım",
-    "logout":"Çıkış Yap"
+    "logout":"Çıkış Yap",
+    "day":"Gün",
+    "internalTemperature":"İç Isı",
+    "outsideTemperature":"Dış Isı",
+    "humidty":"Nem",
+    "co2":"Co2",
+    "waterConsumption":"Su Tüketimi",
+    "feedConsumption":"Yem Tüketimi",
+    "humidtyDetail":"Nem Detayı",
+    "inTempDetail":"İç Sıcaklık Detayı",
+    "outTempDetail":"Dış Sıcaklık Detayı",
+    "co2Detail":"Co2 Detayı",
+    "waterConsumptionDetail":"Su Tüketim Detayı",
+    "feedConsumptionDetail":"Yem Tüketimi Detayı",
+    "detail":"Detay",
+    "hourlyConsumption" :"Hourly Consumption",
+    "filter":"Filter",
+    "asdf":"fa"
+
 } 

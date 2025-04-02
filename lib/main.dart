@@ -104,7 +104,6 @@ class _MyAppState extends State<MyApp> {
             sensorId: args['sensorType'],
           );
         },
-        '/escape': (context) => const EscapeScreen(),
       },
     );
   }

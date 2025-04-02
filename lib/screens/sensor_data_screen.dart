@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:mercan_takip_v2/widgets/app_drawer.dart';
 import 'package:mercan_takip_v2/widgets/bottom_nav_bar.dart';
 import 'package:mercan_takip_v2/services/auth_service.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';//İngilizce ve Türkçe için dil seçimi yapılıyor.
 
 class DashedLinePainter extends CustomPainter {
   final Size screenSize;
@@ -233,6 +234,7 @@ class _SensorDataScreen2State extends State<SensorDataScreen2> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;//İngilizce ve Türkçe için dil seçimi yapılıyor.
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
@@ -293,7 +295,7 @@ class _SensorDataScreen2State extends State<SensorDataScreen2> {
                             textAlign: TextAlign.center,
                           ),
                           SizedBox(height: 4),
-                          Text('${_sensorData!['gun']}. Gün', 
+                          Text('${_sensorData!['gun']}. ${l10n.day}', 
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 16
@@ -343,7 +345,7 @@ class _SensorDataScreen2State extends State<SensorDataScreen2> {
                                   context,
                                   '/sensor_detail',
                                   arguments: {
-                                    'title': 'İç Sıcaklık Detayı',
+                                    'title': '${l10n.inTempDetail}',
                                     'value': '${_sensorData!['ic_sicaklik']}°C',
                                     'coopId': widget.coopId,
                                     'coopName': widget.coopName,
@@ -352,7 +354,7 @@ class _SensorDataScreen2State extends State<SensorDataScreen2> {
                                   },
                                 );
                               },
-                              child: _buildSensorIndicator('${_sensorData!['ic_sicaklik']}°C', 'İç Isı'),
+                              child: _buildSensorIndicator('${_sensorData!['ic_sicaklik']}°C', '${l10n.internalTemperature}'),
                             ),
                           ),
                           // CO2
@@ -365,7 +367,7 @@ class _SensorDataScreen2State extends State<SensorDataScreen2> {
                                   context,
                                   '/sensor_detail',
                                   arguments: {
-                                    'title': 'CO2 Detayı',
+                                    'title': '${l10n.co2Detail}',
                                     'value': '${_sensorData!['co2']} ppm',
                                     'coopId': widget.coopId,
                                     'coopName': widget.coopName,
@@ -416,7 +418,7 @@ class _SensorDataScreen2State extends State<SensorDataScreen2> {
                                     ),
                                     SizedBox(height: 4),
                                     Text(
-                                      'CO2',
+                                      '${l10n.co2}',
                                       style: TextStyle(
                                         fontSize: 14,
                                         color: Colors.grey[700],
@@ -437,7 +439,7 @@ class _SensorDataScreen2State extends State<SensorDataScreen2> {
                                   context,
                                   '/sensor_detail',
                                   arguments: {
-                                    'title': 'Dış Sıcaklık Detayı',
+                                    'title': '${l10n.outTempDetail}',
                                     'value': '${_sensorData!['dis_sicaklik']}°C',
                                     'coopId': widget.coopId,
                                     'coopName': widget.coopName,
@@ -447,7 +449,7 @@ class _SensorDataScreen2State extends State<SensorDataScreen2> {
                                   },
                                 );
                               },
-                              child: _buildSensorIndicator('${_sensorData!['dis_sicaklik']}°C', 'Dış Isı'),
+                              child: _buildSensorIndicator('${_sensorData!['dis_sicaklik']}°C', '${l10n.outsideTemperature}'),
                             ),
                           ),
                           // Nem
@@ -460,7 +462,7 @@ class _SensorDataScreen2State extends State<SensorDataScreen2> {
                                   context,
                                   '/sensor_detail',
                                   arguments: {
-                                    'title': 'Nem Detayı',
+                                    'title': '${l10n.humidtyDetail}',
                                     'value': '%${_sensorData!['nem']}',
                                     'coopId': widget.coopId,
                                     'coopName': widget.coopName,
@@ -469,7 +471,7 @@ class _SensorDataScreen2State extends State<SensorDataScreen2> {
                                   },
                                 );
                               },
-                              child: _buildSensorIndicator('%${_sensorData!['nem']}', 'Nem'),
+                              child: _buildSensorIndicator('%${_sensorData!['nem']}', '${l10n.humidty}'),
                             ),
                           ),
                         ],
@@ -488,8 +490,8 @@ class _SensorDataScreen2State extends State<SensorDataScreen2> {
                                   context,
                                   '/sensor_detail',
                                   arguments: {
-                                    'title': 'Su Tüketimi Detayı',
-                                    'value': _sensorData!['su_tuketimi'],
+                                    'title': '${l10n.waterConsumptionDetail}',
+                                    'value': '${_sensorData!['su_tuketimi']} L',
                                     'coopId': widget.coopId,
                                     'coopName': widget.coopName,
                                     'sensorType': 'su_tuketimi',
@@ -497,7 +499,7 @@ class _SensorDataScreen2State extends State<SensorDataScreen2> {
                                   },
                                 );
                               },
-                              child: _buildInfoCard('Su Tüketimi', _sensorData!['su_tuketimi'], const Color.fromARGB(255, 70, 91, 109)!),
+                              child: _buildInfoCard('${l10n.waterConsumption}', _sensorData!['su_tuketimi'], const Color.fromARGB(255, 70, 91, 109)!),
                             ),
                           ),
                           SizedBox(width: 8),
@@ -508,8 +510,8 @@ class _SensorDataScreen2State extends State<SensorDataScreen2> {
                                   context,
                                   '/sensor_detail',
                                   arguments: {
-                                    'title': 'Yem Tüketimi Detayı',
-                                    'value': _sensorData!['yem_tuketimi'],
+                                    'title': '${l10n.feedConsumptionDetail}',
+                                    'value': '${_sensorData!['yem_tuketimi']} kg',
                                     'coopId': widget.coopId,
                                     'coopName': widget.coopName,
                                     'sensorType': 'yem_tuketimi',
@@ -517,7 +519,7 @@ class _SensorDataScreen2State extends State<SensorDataScreen2> {
                                   },
                                 );
                               },
-                              child: _buildInfoCard('Yem Tüketimi', _sensorData!['yem_tuketimi'], const Color.fromARGB(255, 143, 111, 81)!),
+                              child: _buildInfoCard('${l10n.feedConsumption}', _sensorData!['yem_tuketimi'], const Color.fromARGB(255, 143, 111, 81)!),
                             ),
                           ),
                         ],

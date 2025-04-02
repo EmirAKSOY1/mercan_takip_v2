@@ -6,7 +6,7 @@ import 'package:mercan_takip_v2/services/auth_service.dart';
 import 'dart:math';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';//İngilizce ve Türkçe için dil seçimi yapılıyor.
 class ChartData {
   final DateTime time;
   final double value;
@@ -346,6 +346,7 @@ class _SensorDetailScreenState extends State<SensorDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;//İngilizce ve Türkçe için dil seçimi yapılıyor.
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
@@ -457,7 +458,7 @@ class _SensorDetailScreenState extends State<SensorDetailScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Tarih Aralığı',
+                              '${l10n.dateRange}',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -613,7 +614,7 @@ class _SensorDetailScreenState extends State<SensorDetailScreen> {
                                     ),
                                   ),
                                 ),
-                                confirmText: 'Filtrele',
+                                confirmText: '${l10n.filter}',
                                 cancelText: '',
                                 onSubmit: (Object? value) {
                                   _applyFilter();
@@ -648,8 +649,8 @@ class _SensorDetailScreenState extends State<SensorDetailScreen> {
                               padding: const EdgeInsets.only(left: 8, bottom: 16),
                               child: Text(
                                 widget.sensorType == 'su_tuketimi' || widget.sensorType == 'yem_tuketimi' 
-                                ? 'Saatlik Tüketim' 
-                                : 'Seçilen Tarih Aralığı',
+                                ? '${l10n.hourlyConsumption}' 
+                                : '${l10n.selecteddateRange}',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,

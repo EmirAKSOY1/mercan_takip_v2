@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';//İngilizce ve Türkçe için dil seçimi yapılıyor.
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mercan_takip_v2/widgets/app_drawer.dart';
 
@@ -46,7 +46,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context)!;//İngilizce ve Türkçe için dil seçimi yapılıyor.
     
     return Scaffold(
       drawer: const AppDrawer(currentRoute: '/settings'),
